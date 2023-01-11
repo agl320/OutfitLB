@@ -24,17 +24,35 @@ class Top(Clothing):
     def __init__(self, name, desc="", colour="#ffffff", sleeves=True, clean=True):
         super().__init__(name, "top", desc, colour, clean)
         self.sleeves = sleeves
+
+class Bottom(Clothing):
+    def __init__(self, name, desc="", colour="#ffffff", clean=True):
+        super().__init__(name, "top", desc, colour, clean)
+
+class Shoes(Clothing):
+    def __init__(self, name, desc="", colour="#ffffff", clean=True):
+        super().__init__(name, "top", desc, colour, clean)
+        
         
 def add_c(txt):
-    global all_clothing
+    global all_clothing, v
 
     add_c_name = txt.get("1.0",tk.END).replace('\n',' ')
     #new_c_name = str(input())
-    print(f"[+] {add_c_name}")
+    print(f"[+ type:{v.get()}] {add_c_name}")
 
-    all_clothing.append(Top(add_c_name, "Custom"))
+    match v.get():
+        case 0:
+            all_clothing.append(Top(add_c_name, "Custom"))
+        case 1:
+            all_clothing.append(Bottom(add_c_name, "Custom"))
+        case 2:
+            all_clothing.append(Shoes(add_c_name, "Custom"))
     clothing_lb.insert(tk.END, add_c_name)
     
+def print_debug(var, index, mode):
+    global v
+    print(f"Add switched to {v.get()}")
 
 all_clothing = []
 
@@ -44,12 +62,11 @@ outfits = []
 
 shirt_1 = Top("Blue Shirt", "Blue shirt I bought at Wendy's")
 shirt_2 = Top("Black Shirt", "Blue shirt I bought at McDonald's")
-shirt_3 = Top("Nut Shirt", "Blue shirt I bought at Arby's")
+shirt_3 = Top("Red Shirt", "Blue shirt I bought at Arby's")
 
 all_clothing.append(shirt_1)
 all_clothing.append(shirt_2)
 all_clothing.append(shirt_3)
-
 
 
 # TK RENDERING
@@ -80,11 +97,24 @@ add_c_b = tk.Button(
     command=lambda: add_c(add_c_txt)
     )
 
+# Add clothing type
+v = tk.IntVar(window, 0) # default value is top
+
+# debugging
+v.trace('w',print_debug)
+
+add_c_rb_top = tk.Radiobutton(window, text="Top", variable=v, value=0)
+add_c_rb_bot = tk.Radiobutton(window, text="Bottom", variable=v, value=1)
+add_c_rb_sh = tk.Radiobutton(window, text="Shoes", variable=v, value=2)
+
 # Widget placement
 window.config(pady=10,padx=10)
 clothing_lb.grid(row=0,column=0,columnspan=2)
-add_c_txt.grid(row=1,column=0)
-add_c_b.grid(row=1,column=1)
+add_c_rb_top.grid(row=1,column=0,sticky="W")
+add_c_rb_bot.grid(row=2,column=0,sticky="W")
+add_c_rb_sh.grid(row=3,column=0,sticky="W")
+add_c_txt.grid(row=1,column=1,rowspan=3)
+add_c_b.grid(row=1,column=2,rowspan=3)
 
 
 window.mainloop()
