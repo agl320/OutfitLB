@@ -34,20 +34,26 @@ class Shoes(Clothing):
     def __init__(self, name, desc="", colour="#ffffff", clean=True):
         super().__init__(name, "SHOES", desc, colour, clean)
         
-def add_c(txt):
+def add_c(en, txt):
     global all_clothing, v
 
-    add_c_name = txt.get("1.0",tk.END).replace('\n',' ')
+    add_c_name = en.get()
+    add_c_txt = txt.get("1.0",tk.END).replace('\n',' ')
     #new_c_name = str(input())
+
+    # If empty string, use no name
+    if not add_c_name or add_c_name.isspace():
+        add_c_name = "No name"
+
     print(f"[+ type:{v.get()}] {add_c_name}")
 
     match v.get():
         case 0:
-            all_clothing.append(Top(add_c_name, "Custom"))
+            all_clothing.append(Top(add_c_name, add_c_txt, "Custom"))
         case 1:
-            all_clothing.append(Bottom(add_c_name, "Custom"))
+            all_clothing.append(Bottom(add_c_name, add_c_txt, "Custom"))
         case 2:
-            all_clothing.append(Shoes(add_c_name, "Custom"))
+            all_clothing.append(Shoes(add_c_name, add_c_txt, "Custom"))
     clothing_lb.insert(tk.END, add_c_name)
     
 def print_debug(var, index, mode):
@@ -78,6 +84,9 @@ def get_preview():
         strvar.set(all_clothing[c_selection[0]].get_info())
         c_prev_label = tk.Label(window, textvariable=strvar, font=("Arial", 15, 'bold')) 
 
+
+# MAIN
+
 all_clothing = []
 
 # outfit combinations
@@ -97,7 +106,7 @@ window = tk.Tk()
 window.geometry('1200x800')
 w_title = window.title("Outfit Manager")
 
-clothing_lb = tk.Listbox(window, height = 10, width = 15,bg = "grey",activestyle = 'dotbox',font = "Helvetica",fg = "yellow")
+clothing_lb = tk.Listbox(window, height = 10, width = 25,bg = "grey",activestyle = 'dotbox',font = "Helvetica",fg = "yellow")
 
 # All clothing column
 print("ADDING CLOTHING...")
@@ -110,44 +119,69 @@ print("FINISHED ADDING CLOTHING")
 
 # CLOTHING PANEL PREVIEW
 strvar = tk.StringVar()
-c_prev_label = tk.Label(textvariable=strvar, font=("Arial", 15, 'bold')) 
+c_prev_label = tk.Label(window, textvariable=strvar, font=("Arial", 15, 'bold'),justify= tk.LEFT) 
 c_preview_b = tk.Button(window, text='Preview', command=get_preview)
 
 
 # Add clothing
-add_c_txt = tk.Text(window,width=15,height=2)
+# framing for packing together below
+add_c_frame = tk.Frame(window)
+add_c_frame_2 = tk.Frame(window)
 
+# Name frame
+add_c_en_label = tk.Label(add_c_frame, text="Name",justify= tk.LEFT)
+add_c_en = tk.Entry(add_c_frame,width=20)
+
+# Description frame
+add_c_en_label_2 = tk.Label(add_c_frame_2, text="Description",justify= tk.LEFT)
+add_c_txt = tk.Text(add_c_frame_2, width=15,height=2)
+
+# Button submit
 add_c_b = tk.Button(
     window,
     text="ADD", 
     padx=10, 
     pady=5,
-    command=lambda: add_c(add_c_txt)
+    command=lambda: add_c(add_c_en, add_c_txt)
     )
 
-# Add clothing type
+# Add clothing TYPE
+# Clothing type frame
+add_c_frame_type = tk.Frame(window)
+
 v = tk.IntVar(window, 0) # default value is top
 
 # debugging
 v.trace('w',print_debug)
 
-add_c_rb_top = tk.Radiobutton(window, text="Top", variable=v, value=0)
-add_c_rb_bot = tk.Radiobutton(window, text="Bottom", variable=v, value=1)
-add_c_rb_sh = tk.Radiobutton(window, text="Shoes", variable=v, value=2)
-
-
+add_c_rb_top = tk.Radiobutton(add_c_frame_type, text="Top", variable=v, value=0)
+add_c_rb_bot = tk.Radiobutton(add_c_frame_type, text="Bottom", variable=v, value=1)
+add_c_rb_sh = tk.Radiobutton(add_c_frame_type, text="Shoes", variable=v, value=2)
 
 # Widget placement
-window.config(pady=10,padx=10)\
+window.config(pady=10,padx=10)
 
-clothing_lb.grid(row=0,column=0,columnspan=2)
-c_preview_b.grid(row=0,column=2)
-c_prev_label.grid(row=0,column=3)
-add_c_rb_top.grid(row=1,column=0,sticky="W")
-add_c_rb_bot.grid(row=2,column=0,sticky="W")
-add_c_rb_sh.grid(row=3,column=0,sticky="W")
-add_c_txt.grid(row=1,column=1,rowspan=3)
+clothing_lb.grid(row=0,column=0,columnspan=3,sticky="W")
+c_preview_b.grid(row=0,column=3,sticky="W")
+c_prev_label.grid(row=0,column=4,sticky="W")
+
+# add clothing type widgets
+add_c_frame_type.grid(row=1,column=0,rowspan=3)
+add_c_rb_top.grid(row=0,column=0,sticky="W")
+add_c_rb_bot.grid(row=1,column=0,sticky="W")
+add_c_rb_sh.grid(row=2,column=0,sticky="W")
+
+# clothing add widgets
+add_c_frame.grid(row=1,column=1)
+add_c_frame_2.grid(row=2, column=1)
+#add_c_en.grid(row=1,column=1,rowspan=1,sticky="N")
+# name 
+add_c_en_label.grid(row=0,column=0,sticky="W")
+add_c_en.grid(row=1,column=0,sticky="N")
+# description
+add_c_en_label_2.grid(row=0,column=0,sticky="W")
+add_c_txt.grid(row=1,column=0,rowspan=1,sticky="N")
+# button subimt
 add_c_b.grid(row=1,column=2,rowspan=3)
-
 
 window.mainloop()
