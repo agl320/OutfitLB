@@ -6,13 +6,14 @@ class Clothing():
         self.desc = desc
         self.clothing_type = clothing_type.upper()
         self.colour = colour
+        self.clean = clean
 
     def print_info(self):
         print(f"Name: {self.name}")
         print(f"Description: {self.desc}")
 
     def get_info(self):
-        info_str = f"Name: {self.name}\nDescription: {self.desc}\nClothing type: {self.clothing_type}"
+        info_str = f"Name: {self.name}\nDescription: {self.desc}\nType: {self.clothing_type}"
         return info_str
 
     def get_name(self):
@@ -35,7 +36,7 @@ class Shoes(Clothing):
         super().__init__(name, "SHOES", desc, colour, clean)
         
 def add_c(en, txt):
-    global all_clothing, v
+    global all_clothing, v, clean_var
 
     add_c_name = en.get()
     add_c_txt = txt.get("1.0",tk.END).replace('\n',' ')
@@ -54,7 +55,14 @@ def add_c(en, txt):
             all_clothing.append(Bottom(add_c_name, add_c_txt, "Custom"))
         case 2:
             all_clothing.append(Shoes(add_c_name, add_c_txt, "Custom"))
-    clothing_lb.insert(tk.END, add_c_name)
+    
+    # Check if clean
+    if clean_var.get():#[].is_clean():
+        clothing_lb.insert(tk.END, add_c_name)
+        clothing_lb.itemconfig(tk.END,{'bg':'Green'})
+    else:
+        clothing_lb.insert(tk.END, add_c_name)
+        clothing_lb.itemconfig(tk.END,{'bg':'Red'})
     
 def print_debug(var, index, mode):
     global v
@@ -77,13 +85,16 @@ def get_preview():
     if not c_selection:
         print(">> None selected.")
         strvar.set("None selected.")
-        c_prev_label = tk.Label(window, textvariable=strvar, font=("Arial", 15, 'bold')) 
+        c_prev_label = tk.Label(window, textvariable=strvar, font=("Helvetica", 15)) 
     else:
         print(">> Selected")
         #strvar.set(clothing_lb.get(c_selection))
         strvar.set(all_clothing[c_selection[0]].get_info())
-        c_prev_label = tk.Label(window, textvariable=strvar, font=("Arial", 15, 'bold')) 
+        c_prev_label = tk.Label(window, textvariable=strvar, font=("Helvetica", 15)) 
 
+#def update_lb():
+ #       global window, clothing_lb
+  #      window.after(100, update_lb)
 
 # MAIN
 
@@ -94,7 +105,7 @@ outfits = []
 
 shirt_1 = Top("Blue Shirt", "Blue shirt I bought at Wendy's")
 shirt_2 = Top("Black Shirt", "Blue shirt I bought at McDonald's")
-shirt_3 = Top("Red Shirt", "Blue shirt I bought at Arby's")
+shirt_3 = Top("Red Shirt", "Blue shirt I bought at Arby's", clean=False)
 
 all_clothing.append(shirt_1)
 all_clothing.append(shirt_2)
@@ -103,23 +114,46 @@ all_clothing.append(shirt_3)
 # TK RENDERING
 
 window = tk.Tk()
-window.geometry('1200x800')
+window.geometry('650x500')
 w_title = window.title("Outfit Manager")
 
-clothing_lb = tk.Listbox(window, height = 10, width = 25,bg = "grey",activestyle = 'dotbox',font = "Helvetica",fg = "yellow")
+
 
 # All clothing column
+all_c_frame = tk.Frame(window)
+
+# vertical scrollbar for all clothing
+
+#all_c_label = tk.Label(all_c_frame, text="ALL CLOTHING",justify= tk.LEFT)
+w_sb = tk.Scrollbar(window, orient=tk.VERTICAL) 
+#w_sb.config(command = clothing_lb.yview)
+
+clothing_lb = tk.Listbox(all_c_frame, yscrollcommand=w_sb.set, height = 10, width = 25,bg = "grey",activestyle = 'dotbox',font = "Helvetica",fg = "yellow")
+w_sb['command'] = clothing_lb.yview
+
+
 print("ADDING CLOTHING...")
 
 for i, clothing in enumerate(all_clothing):
     clothing_lb.insert(i, clothing.get_name())
     print(f"[+] {clothing.get_name()}")
 
+    if clothing.is_clean():
+        clothing_lb.itemconfig(i,{'bg':'Green'})
+    else:
+        clothing_lb.itemconfig(i,{'bg':'Red'})
+
 print("FINISHED ADDING CLOTHING")
+
+# Clean clothing column
+#clean_c_frame = tk.Frame(window)
+
+#clean_c_label = tk.Label(clean_c_frame, text="CLEAN CLOTHING",justify= tk.LEFT)
+#clean_c_lb = tk.Listbox(clean_c_frame, height = 10, width = 25,bg = "grey",activestyle = 'dotbox',font = "Helvetica",fg = "yellow")
 
 # CLOTHING PANEL PREVIEW
 strvar = tk.StringVar()
-c_prev_label = tk.Label(window, textvariable=strvar, font=("Arial", 15, 'bold'),justify= tk.LEFT) 
+c_prev_label = tk.Label(window, textvariable=strvar, font=("Helvetica", 10, 'bold'),justify= tk.LEFT) 
 c_preview_b = tk.Button(window, text='Preview', command=get_preview)
 
 
@@ -135,6 +169,11 @@ add_c_en = tk.Entry(add_c_frame,width=20)
 # Description frame
 add_c_en_label_2 = tk.Label(add_c_frame_2, text="Description",justify= tk.LEFT)
 add_c_txt = tk.Text(add_c_frame_2, width=15,height=2)
+
+# Clean? checklist w/ Description frame
+clean_var =  tk.IntVar()
+clean_cb = tk.Checkbutton(add_c_frame_2, text = "Clean?", variable=clean_var)
+
 
 # Button submit
 add_c_b = tk.Button(
@@ -161,7 +200,20 @@ add_c_rb_sh = tk.Radiobutton(add_c_frame_type, text="Shoes", variable=v, value=2
 # Widget placement
 window.config(pady=10,padx=10)
 
-clothing_lb.grid(row=0,column=0,columnspan=3,sticky="W")
+# all clothing list
+all_c_frame.grid(row=0,column=0,columnspan=3,sticky="W")
+#all_c_label.grid(row=0,column=0,columnspan=3,sticky="W")
+clothing_lb.grid(row=1,column=0,columnspan=3)
+
+w_sb.grid(row=0,column=2, sticky='NSE')
+
+# clean clothing list
+#clean_c_frame.grid(row=0,column=5,columnspan=3,sticky="W")
+#clean_c_label.grid(row=0,column=0,columnspan=3,sticky="W")
+#clean_c_lb.grid(row=1,column=0,columnspan=3)
+
+
+# clothing preview (right of all clothing list)
 c_preview_b.grid(row=0,column=3,sticky="W")
 c_prev_label.grid(row=0,column=4,sticky="W")
 
@@ -174,13 +226,17 @@ add_c_rb_sh.grid(row=2,column=0,sticky="W")
 # clothing add widgets
 add_c_frame.grid(row=1,column=1)
 add_c_frame_2.grid(row=2, column=1)
+
 #add_c_en.grid(row=1,column=1,rowspan=1,sticky="N")
 # name 
 add_c_en_label.grid(row=0,column=0,sticky="W")
 add_c_en.grid(row=1,column=0,sticky="N")
+
 # description
 add_c_en_label_2.grid(row=0,column=0,sticky="W")
 add_c_txt.grid(row=1,column=0,rowspan=1,sticky="N")
+clean_cb.grid(row=2,column=0,rowspan=1,sticky="N")
+
 # button subimt
 add_c_b.grid(row=1,column=2,rowspan=3)
 
