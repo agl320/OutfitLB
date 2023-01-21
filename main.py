@@ -132,6 +132,7 @@ clothing_lb = tk.Listbox(all_c_frame, yscrollcommand=w_sb.set, height = 10, widt
 w_sb['command'] = clothing_lb.yview
 
 
+
 print("ADDING CLOTHING...")
 
 for i, clothing in enumerate(all_clothing):
