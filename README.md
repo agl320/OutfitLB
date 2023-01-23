@@ -1,5 +1,5 @@
 # Outfit-Manager
-Stores and manages outfits and clothing. Aimed to be used on a daily basis to save time in the morning. 
+Stores and manages outfits and clothing. Aims to increase clothing sustainability by notifying user of least worn outfits and other clothing data relevant to the user.
 
 TODO:
 - Add ability to discern clean and dirty clothing
