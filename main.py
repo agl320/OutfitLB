@@ -1,40 +1,83 @@
 import tkinter as tk
+from tkinter import filedialog
+from tkinter.filedialog import askopenfile
+
+class User():
+    def __init__(self, firstName, lastName, userName):
+        self.firstName = firstName 
+        self.lastName = lastName 
+        self.userName = userName 
+        self.closet_lst = {}
+
+
+    def new_closet(self, name, ID, desc=""):
+        self.closet_lst[ID]=Closet(name, desc)
+
+    def get_closet(self, ID):
+        return self.closet_lst[ID]
+
+    def view_all_closets(self):
+        print(self.closet_lst)
+        
+
+class Closet():
+    def __init__(self, name, desc=""):
+        self.clothing_lst = []
+        self.name = name
+
+    def add_Top(self, name, desc="", colour="#ffffff", sleeves=True, clean=True):
+        self.clothing_lst.append(Top(name, desc, colour, sleeves, clean))
+
+    def add_Bottom(self, name, desc="", colour="#ffffff", clean=True):
+        self.clothing_lst.append(Bottom(name, desc, colour, clean))
+
+    def add_Shoes(self, name, desc="", colour="#ffffff", clean=True):
+        self.clothing_lst.append(Shoes(name, desc, colour, clean))
+
+    def __repr__(self):
+        return self.name
 
 class Clothing():
-    def __init__(self, name, clothing_type, desc="", colour="#ffffff", clean=True):
+    def __init__(self, name, desc="", colour="#ffffff", clean=True):
         self.name = name
         self.desc = desc
-        self.clothing_type = clothing_type.upper()
         self.colour = colour
         self.clean = clean
 
+    def get_name(self):
+        return self.name
+    
+    def is_clean(self):
+        return self.clean 
+    
     def print_info(self):
         print(f"Name: {self.name}")
         print(f"Description: {self.desc}")
 
     def get_info(self):
-        info_str = f"Name: {self.name}\nDescription: {self.desc}\nType: {self.clothing_type}"
+        info_str = f"Name: {self.name}\nDescription: {self.desc}"
         return info_str
 
     def get_name(self):
         return self.name
 
-    def is_clean(self):
-        return self.clean 
+    def __repr__(self):
+        return "bruh"
 
 class Top(Clothing):
     def __init__(self, name, desc="", colour="#ffffff", sleeves=True, clean=True):
-        super().__init__(name, "TOP", desc, colour, clean)
+        super().__init__(name, desc, colour, clean)
         self.sleeves = sleeves
 
 class Bottom(Clothing):
     def __init__(self, name, desc="", colour="#ffffff", clean=True):
-        super().__init__(name, "BOTTOM", desc, colour, clean)
+        super().__init__(name, desc, colour, clean)
 
 class Shoes(Clothing):
     def __init__(self, name, desc="", colour="#ffffff", clean=True):
-        super().__init__(name, "SHOES", desc, colour, clean)
-        
+        super().__init__(name, desc, colour, clean)
+
+
 def add_c(en, txt):
     global all_clothing, v, clean_var
 
