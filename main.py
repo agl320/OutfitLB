@@ -137,7 +137,7 @@ def get_preview():
 
 def upload():
     # uploading file (image)
-    filepath = filedialog.askopenfilename()
+    filepath = filedialog.askopenfilename(filetypes = (("jpeg files", "*.jpg"),("png files", "*.png"),("all files","*.*")))
     print(filepath)
 
 
