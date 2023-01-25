@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import filedialog
-from tkinter.filedialog import askopenfile
 
 class User():
     def __init__(self, firstName, lastName, userName):
@@ -135,6 +134,13 @@ def get_preview():
         strvar.set(all_clothing[c_selection[0]].get_info())
         c_prev_label = tk.Label(window, textvariable=strvar, font=("Helvetica", 15)) 
 
+
+def upload():
+    # uploading file (image)
+    filepath = filedialog.askopenfilename()
+    print(filepath)
+
+
 #def update_lb():
  #       global window, clothing_lb
   #      window.after(100, update_lb)
@@ -207,8 +213,8 @@ add_c_frame = tk.Frame(window)
 add_c_frame_2 = tk.Frame(window)
 
 # Name frame
-add_c_en_label = tk.Label(add_c_frame, text="Name",justify= tk.LEFT)
-add_c_en = tk.Entry(add_c_frame,width=20)
+add_c_en_label = tk.Label(add_c_frame_2, text="Name",justify= tk.LEFT)
+add_c_en = tk.Entry(add_c_frame_2,width=20)
 
 # Description frame
 add_c_en_label_2 = tk.Label(add_c_frame_2, text="Description",justify= tk.LEFT)
@@ -217,6 +223,8 @@ add_c_txt = tk.Text(add_c_frame_2, width=15,height=2)
 # Clean? checklist w/ Description frame
 clean_var =  tk.IntVar()
 clean_cb = tk.Checkbutton(add_c_frame_2, text = "Clean?", variable=clean_var)
+
+
 
 
 # Button submit
@@ -240,6 +248,8 @@ v.trace('w',print_debug)
 add_c_rb_top = tk.Radiobutton(add_c_frame_type, text="Top", variable=v, value=0)
 add_c_rb_bot = tk.Radiobutton(add_c_frame_type, text="Bottom", variable=v, value=1)
 add_c_rb_sh = tk.Radiobutton(add_c_frame_type, text="Shoes", variable=v, value=2)
+
+img_b = tk.Button(add_c_frame_type, text="Image", command=upload)
 
 # Widget placement
 window.config(pady=10,padx=10)
@@ -266,6 +276,8 @@ add_c_frame_type.grid(row=1,column=0,rowspan=3)
 add_c_rb_top.grid(row=0,column=0,sticky="W")
 add_c_rb_bot.grid(row=1,column=0,sticky="W")
 add_c_rb_sh.grid(row=2,column=0,sticky="W")
+# add image (under clothing type)
+img_b.grid(row=3,column=0,rowspan=1,sticky="N")
 
 # clothing add widgets
 add_c_frame.grid(row=1,column=1)
@@ -277,11 +289,12 @@ add_c_en_label.grid(row=0,column=0,sticky="W")
 add_c_en.grid(row=1,column=0,sticky="N")
 
 # description
-add_c_en_label_2.grid(row=0,column=0,sticky="W")
-add_c_txt.grid(row=1,column=0,rowspan=1,sticky="N")
-clean_cb.grid(row=2,column=0,rowspan=1,sticky="N")
+add_c_en_label_2.grid(row=2,column=0,sticky="W")
+add_c_txt.grid(row=3,column=0,rowspan=1,sticky="N")
+clean_cb.grid(row=4,column=0,rowspan=1,sticky="N")
+
 
 # button subimt
-add_c_b.grid(row=1,column=2,rowspan=3)
+add_c_b.grid(row=1,column=2,rowspan=3, sticky="S")
 
 window.mainloop()
