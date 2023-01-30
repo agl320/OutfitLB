@@ -2,13 +2,17 @@ import tkinter as tk
 from tkinter import filedialog
 from PIL import Image, ImageTk
 
+
+# User class
+# - User will have set of closets
+# - Each closet contains dict of Clothing
+# - - Each closet can be accessed by ID
 class User():
     def __init__(self, firstName, lastName, userName):
         self.firstName = firstName 
         self.lastName = lastName 
         self.userName = userName 
         self.closet_lst = {}
-
 
     def new_closet(self, name, ID, desc=""):
         self.closet_lst[ID]=Closet(name, desc)
@@ -19,7 +23,9 @@ class User():
     def view_all_closets(self):
         print(self.closet_lst)
         
-
+# Closet class
+# - Closet contains dict of Clothing (Top, Bottom, Shoes)
+# - Methods to add clothing
 class Closet():
     def __init__(self, name, desc=""):
         self.clothing_lst = []
@@ -37,6 +43,15 @@ class Closet():
     def __repr__(self):
         return self.name
 
+# Clothing class
+# Getters:
+# - Get name
+# - Is clean?
+# - Print info
+# - Get info
+# - Get image filepath
+# Setters:
+# - Set image filepath
 class Clothing():
     def __init__(self, name, desc="", colour="#ffffff", clean=True, filepath=""):
         self.name = name
@@ -58,9 +73,6 @@ class Clothing():
     def get_info(self):
         info_str = f"Name: {self.name}\nDescription: {self.desc}"
         return info_str
-
-    def get_name(self):
-        return self.name
     
     # sets image file path for clothing
     def set_image(self, filepath):
@@ -70,7 +82,7 @@ class Clothing():
         return self.filepath
 
     def __repr__(self):
-        return "bruh"
+        return f"{self.name} of type {self.__class__.__name__}"
 
 class Top(Clothing):
     def __init__(self, name, desc="", colour="#ffffff", sleeves=True, clean=True, filepath=""):
@@ -86,9 +98,11 @@ class Shoes(Clothing):
         super().__init__(name, desc, colour, clean, filepath)
 
 
+# Add clothing to clothing list function
 def add_c(en, txt):
     global all_clothing, v, clean_var, filepath_add
 
+    # get name and description 
     add_c_name = en.get()
     add_c_txt = txt.get("1.0",tk.END).replace('\n',' ')
     #new_c_name = str(input())
@@ -97,8 +111,10 @@ def add_c(en, txt):
     if not add_c_name or add_c_name.isspace():
         add_c_name = "No name"
 
+    # debug print
     print(f"[+ type:{v.get()}] {add_c_name}")
 
+    # Adding to clothing list -> type check
     match v.get():
         case 0:
             all_clothing.append(Top(add_c_name, add_c_txt, "Custom", filepath=filepath_add))
@@ -107,6 +123,9 @@ def add_c(en, txt):
         case 2:
             all_clothing.append(Shoes(add_c_name, add_c_txt, "Custom", filepath=filepath_add))
     
+    # RESET filepath
+    filepath_add=""
+
     # Check if clean
     if clean_var.get():#[].is_clean():
         clothing_lb.insert(tk.END, add_c_name)
@@ -115,6 +134,7 @@ def add_c(en, txt):
         clothing_lb.insert(tk.END, add_c_name)
         clothing_lb.itemconfig(tk.END,{'bg':'Red'})
     
+# 
 def print_debug(var, index, mode):
     global v
     print(f"Add switched to {v.get()}")
@@ -155,7 +175,7 @@ def get_preview():
         c_prev_image.configure(image=image_current)
         # prevent garbage collection
         c_prev_image.image = image_current
-
+    
 
 def upload():
     global filepath_add
