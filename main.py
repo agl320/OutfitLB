@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
+from PIL import Image, ImageTk
 
 class User():
     def __init__(self, firstName, lastName, userName):
@@ -24,24 +25,25 @@ class Closet():
         self.clothing_lst = []
         self.name = name
 
-    def add_Top(self, name, desc="", colour="#ffffff", sleeves=True, clean=True):
-        self.clothing_lst.append(Top(name, desc, colour, sleeves, clean))
+    def add_Top(self, *args):
+        self.clothing_lst.append(Top(*args))
 
-    def add_Bottom(self, name, desc="", colour="#ffffff", clean=True):
-        self.clothing_lst.append(Bottom(name, desc, colour, clean))
+    def add_Bottom(self, *args):
+        self.clothing_lst.append(Bottom(*args))
 
-    def add_Shoes(self, name, desc="", colour="#ffffff", clean=True):
-        self.clothing_lst.append(Shoes(name, desc, colour, clean))
+    def add_Shoes(self, *args):
+        self.clothing_lst.append(Shoes(*args))
 
     def __repr__(self):
         return self.name
 
 class Clothing():
-    def __init__(self, name, desc="", colour="#ffffff", clean=True):
+    def __init__(self, name, desc="", colour="#ffffff", clean=True, filepath=""):
         self.name = name
         self.desc = desc
         self.colour = colour
         self.clean = clean
+        self.filepath=filepath
 
     def get_name(self):
         return self.name
@@ -59,26 +61,33 @@ class Clothing():
 
     def get_name(self):
         return self.name
+    
+    # sets image file path for clothing
+    def set_image(self, filepath):
+        self.filepath = filepath
+    
+    def get_image(self):
+        return self.filepath
 
     def __repr__(self):
         return "bruh"
 
 class Top(Clothing):
-    def __init__(self, name, desc="", colour="#ffffff", sleeves=True, clean=True):
-        super().__init__(name, desc, colour, clean)
+    def __init__(self, name, desc="", colour="#ffffff", sleeves=True, clean=True, filepath=""):
+        super().__init__(name, desc, colour, clean, filepath)
         self.sleeves = sleeves
 
 class Bottom(Clothing):
-    def __init__(self, name, desc="", colour="#ffffff", clean=True):
-        super().__init__(name, desc, colour, clean)
+    def __init__(self, name, desc="", colour="#ffffff", clean=True, filepath=""):
+        super().__init__(name, desc, colour, clean, filepath)
 
 class Shoes(Clothing):
-    def __init__(self, name, desc="", colour="#ffffff", clean=True):
-        super().__init__(name, desc, colour, clean)
+    def __init__(self, name, desc="", colour="#ffffff", clean=True, filepath=""):
+        super().__init__(name, desc, colour, clean, filepath)
 
 
 def add_c(en, txt):
-    global all_clothing, v, clean_var
+    global all_clothing, v, clean_var, filepath_add
 
     add_c_name = en.get()
     add_c_txt = txt.get("1.0",tk.END).replace('\n',' ')
@@ -92,11 +101,11 @@ def add_c(en, txt):
 
     match v.get():
         case 0:
-            all_clothing.append(Top(add_c_name, add_c_txt, "Custom"))
+            all_clothing.append(Top(add_c_name, add_c_txt, "Custom", filepath=filepath_add))
         case 1:
-            all_clothing.append(Bottom(add_c_name, add_c_txt, "Custom"))
+            all_clothing.append(Bottom(add_c_name, add_c_txt, "Custom", filepath=filepath_add))
         case 2:
-            all_clothing.append(Shoes(add_c_name, add_c_txt, "Custom"))
+            all_clothing.append(Shoes(add_c_name, add_c_txt, "Custom", filepath=filepath_add))
     
     # Check if clean
     if clean_var.get():#[].is_clean():
@@ -111,7 +120,7 @@ def print_debug(var, index, mode):
     print(f"Add switched to {v.get()}")
 
 def get_preview():
-    global c_prev_label, clothing_lb, strvar
+    global c_prev_label, clothing_lb, strvar, c_prev_image
     #c_prev_label = tk.Label(text="Convert to German Cognate", font=("Arial", 15, 'bold'))
     #c_selected = clothing_lb.get(clothing_lb.curselection()[0])
     
@@ -128,17 +137,32 @@ def get_preview():
         print(">> None selected.")
         strvar.set("None selected.")
         c_prev_label = tk.Label(window, textvariable=strvar, font=("Helvetica", 15)) 
+        c_prev_image = tk.Label(window, text="No image.")
     else:
         print(">> Selected")
         #strvar.set(clothing_lb.get(c_selection))
         strvar.set(all_clothing[c_selection[0]].get_info())
         c_prev_label = tk.Label(window, textvariable=strvar, font=("Helvetica", 15)) 
 
+        # getting and displaying current clothing image
+        filepath_current = all_clothing[c_selection[0]].get_image()
+        if not filepath_current or filepath_current.isspace():
+            filepath_current = "image.jpg"
+            print("> No image for current")
+
+        image_current = Image.open(filepath_current).resize((50, 50))
+        image_current = ImageTk.PhotoImage(image_current)
+        c_prev_image.configure(image=image_current)
+        # prevent garbage collection
+        c_prev_image.image = image_current
+
 
 def upload():
+    global filepath_add
+    filepath_add = ""
     # uploading file (image)
-    filepath = filedialog.askopenfilename(filetypes = (("jpeg files", "*.jpg"),("png files", "*.png"),("all files","*.*")))
-    print(filepath)
+    filepath_add = filedialog.askopenfilename(filetypes = (("jpeg files", "*.jpg"),("png files", "*.png"),("all files","*.*")))
+    print(filepath_add)
 
 
 #def update_lb():
@@ -206,6 +230,12 @@ strvar = tk.StringVar()
 c_prev_label = tk.Label(window, textvariable=strvar, font=("Helvetica", 10, 'bold'),justify= tk.LEFT) 
 c_preview_b = tk.Button(window, text='Preview', command=get_preview)
 
+filepath_current = "image.jpg"
+image_current = Image.open(filepath_current).resize((50, 50))        
+image_current = ImageTk.PhotoImage(image_current)
+
+c_prev_image = tk.Label(window, text="No image.", image=image_current)
+
 
 # Add clothing
 # framing for packing together below
@@ -270,6 +300,7 @@ w_sb.grid(row=0,column=2, sticky='NSE')
 # clothing preview (right of all clothing list)
 c_preview_b.grid(row=0,column=3,sticky="W")
 c_prev_label.grid(row=0,column=4,sticky="W")
+c_prev_image.grid(row=0,column=5,sticky="W")
 
 # add clothing type widgets
 add_c_frame_type.grid(row=1,column=0,rowspan=3)
