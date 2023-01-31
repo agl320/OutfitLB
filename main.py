@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, ttk
 from PIL import Image, ImageTk
 
 
@@ -20,8 +20,27 @@ class User():
     def get_closet(self, ID):
         return self.closet_lst[ID]
 
+    # returns dict of all closets
+    def get_all(self):
+        return self.closet_lst.copy()
+
+    def get_all_closet_name(self):
+        # get closet list values in dict 
+        # wrap and convert to list since values() returns view
+        name_lst = list(self.closet_lst.values())
+            
+        return name_lst.copy()
+
+    def get_all_closet_id(self):
+        id_list = list(self.closet_lst.keys())
+        return id_list.copy()
+
     def view_all_closets(self):
         print(self.closet_lst)
+
+    def save_closet(self,closet_new,ID):
+        self.closet_lst[ID].set_closet(closet_new)
+        print(f"UPDATED CLOSET [{ID}]: {self.closet_lst}")
         
 # Closet class
 # - Closet contains dict of Clothing (Top, Bottom, Shoes)
@@ -39,6 +58,15 @@ class Closet():
 
     def add_Shoes(self, *args):
         self.clothing_lst.append(Shoes(*args))
+    
+    # Return all clothing in list form
+    def get_all(self):
+        return self.clothing_lst.copy()
+    
+    def set_closet(self, clothing_lst_new):
+        self.clothing_lst = clothing_lst_new
+    
+    
 
     def __repr__(self):
         return self.name
@@ -53,7 +81,7 @@ class Closet():
 # Setters:
 # - Set image filepath
 class Clothing():
-    def __init__(self, name, desc="", colour="#ffffff", clean=True, filepath=""):
+    def __init__(self, name, desc="", colour="#ffffff", clean=1, filepath="image.jpg"):
         self.name = name
         self.desc = desc
         self.colour = colour
@@ -85,16 +113,16 @@ class Clothing():
         return f"{self.name} of type {self.__class__.__name__}"
 
 class Top(Clothing):
-    def __init__(self, name, desc="", colour="#ffffff", sleeves=True, clean=True, filepath=""):
+    def __init__(self, name, desc="", colour="#ffffff", sleeves=True, clean=1, filepath=""):
         super().__init__(name, desc, colour, clean, filepath)
         self.sleeves = sleeves
 
 class Bottom(Clothing):
-    def __init__(self, name, desc="", colour="#ffffff", clean=True, filepath=""):
+    def __init__(self, name, desc="", colour="#ffffff", clean=1, filepath=""):
         super().__init__(name, desc, colour, clean, filepath)
 
 class Shoes(Clothing):
-    def __init__(self, name, desc="", colour="#ffffff", clean=True, filepath=""):
+    def __init__(self, name, desc="", colour="#ffffff", clean=1, filepath=""):
         super().__init__(name, desc, colour, clean, filepath)
 
 
@@ -117,11 +145,11 @@ def add_c(en, txt):
     # Adding to clothing list -> type check
     match v.get():
         case 0:
-            all_clothing.append(Top(add_c_name, add_c_txt, "Custom", filepath=filepath_add))
+            all_clothing.append(Top(add_c_name, add_c_txt, "Custom", clean=clean_var.get(), filepath=filepath_add))
         case 1:
-            all_clothing.append(Bottom(add_c_name, add_c_txt, "Custom", filepath=filepath_add))
+            all_clothing.append(Bottom(add_c_name, add_c_txt, "Custom", clean=clean_var.get(), filepath=filepath_add))
         case 2:
-            all_clothing.append(Shoes(add_c_name, add_c_txt, "Custom", filepath=filepath_add))
+            all_clothing.append(Shoes(add_c_name, add_c_txt, "Custom", clean=clean_var.get(), filepath=filepath_add))
     
     # RESET filepath
     filepath_add=""
@@ -176,7 +204,6 @@ def get_preview():
         # prevent garbage collection
         c_prev_image.image = image_current
     
-
 def upload():
     global filepath_add
     filepath_add = ""
@@ -184,25 +211,73 @@ def upload():
     filepath_add = filedialog.askopenfilename(filetypes = (("jpeg files", "*.jpg"),("png files", "*.png"),("all files","*.*")))
     print(filepath_add)
 
+# DEBUG
+def dropdown_callback(*args):
+    global all_clothing, clothing_lb, agl13, dropdown
+    
+    # UPDATE
+    print("Closet selected: ", dropdown.get())
+
+    # CLEAR
+    clothing_lb.delete(0,tk.END)
+    all_clothing = []
+
+    all_clothing = agl13.get_closet(dropdown.get()).get_all()
+    
+    for i, clothing in enumerate(all_clothing):
+        clothing_lb.insert(i, clothing.get_name())
+
+        print(f"[+] {clothing.get_name()}")
+        print(f"\t[>] CLEAN:{clothing.is_clean()}")
+        
+        if clothing.is_clean():
+            clothing_lb.itemconfig(i,{'bg':'Green'})
+        else:
+            clothing_lb.itemconfig(i,{'bg':'Red'})
+            
+
+
+def save_to_user():
+    global all_clothing, dropdown, agl13
+    agl13.save_closet(all_clothing,dropdown.get())
+
 
 #def update_lb():
  #       global window, clothing_lb
   #      window.after(100, update_lb)
 
 # MAIN
+# GET Closet
+# UPDATE Closet
+# SAVE Closet
 
+# current closet init
 all_clothing = []
 
-# outfit combinations
+# outfit combinations init
 outfits = []
+
+# EXAMPLE closet =================================
+# NEW USER
+    
+agl13 = User("GH", "Andrew", "agl13")
+agl13.new_closet("AC",'0')
+agl13.new_closet("DC",'1')
 
 shirt_1 = Top("Blue Shirt", "Blue shirt I bought at Wendy's")
 shirt_2 = Top("Black Shirt", "Blue shirt I bought at McDonald's")
 shirt_3 = Top("Red Shirt", "Blue shirt I bought at Arby's", clean=False)
 
+all_clothing = agl13.get_closet('0').get_all()
+
 all_clothing.append(shirt_1)
 all_clothing.append(shirt_2)
 all_clothing.append(shirt_3)
+
+# END EXAMPLE ====================================
+
+# Empty filepath init
+filepath_add=""
 
 # TK RENDERING
 
@@ -210,10 +285,17 @@ window = tk.Tk()
 window.geometry('650x500')
 w_title = window.title("Outfit Manager")
 
-
-
 # All clothing column
 all_c_frame = tk.Frame(window)
+
+
+# Drop down menu
+
+dropdown_var = tk.StringVar()
+dropdown = ttk.Combobox(all_c_frame, textvariable=dropdown_var, values=agl13.get_all_closet_id())
+dropdown.current(0)
+dropdown.bind("<<ComboboxSelected>>", dropdown_callback)
+
 
 # vertical scrollbar for all clothing
 
@@ -221,11 +303,11 @@ all_c_frame = tk.Frame(window)
 w_sb = tk.Scrollbar(window, orient=tk.VERTICAL) 
 #w_sb.config(command = clothing_lb.yview)
 
+# DISPLAY current list box of closet
 clothing_lb = tk.Listbox(all_c_frame, yscrollcommand=w_sb.set, height = 10, width = 25,bg = "grey",activestyle = 'dotbox',font = "Helvetica",fg = "yellow")
 w_sb['command'] = clothing_lb.yview
 
-
-
+# DEBUG
 print("ADDING CLOTHING...")
 
 for i, clothing in enumerate(all_clothing):
@@ -301,9 +383,16 @@ add_c_rb_sh = tk.Radiobutton(add_c_frame_type, text="Shoes", variable=v, value=2
 
 img_b = tk.Button(add_c_frame_type, text="Image", command=upload)
 
+# SAVE 
+closet_save_b = tk.Button(window, text='Save closet', command=save_to_user)
+
+
 # Widget placement
 window.config(pady=10,padx=10)
 
+
+# ALL CLOTHING FRAME
+dropdown.grid(row=0,column=0, sticky="NW")
 # all clothing list
 all_c_frame.grid(row=0,column=0,columnspan=3,sticky="W")
 #all_c_label.grid(row=0,column=0,columnspan=3,sticky="W")
@@ -347,5 +436,7 @@ clean_cb.grid(row=4,column=0,rowspan=1,sticky="N")
 
 # button subimt
 add_c_b.grid(row=1,column=2,rowspan=3, sticky="S")
+
+closet_save_b.grid(row=6,column=0)
 
 window.mainloop()
