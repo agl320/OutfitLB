@@ -153,6 +153,7 @@ def add_c(en, txt):
     
     # RESET filepath
     filepath_add=""
+    
 
     # Check if clean
     if clean_var.get():#[].is_clean():
@@ -203,13 +204,6 @@ def get_preview():
         c_prev_image.configure(image=image_current)
         # prevent garbage collection
         c_prev_image.image = image_current
-    
-def upload():
-    global filepath_add
-    filepath_add = ""
-    # uploading file (image)
-    filepath_add = filedialog.askopenfilename(filetypes = (("jpeg files", "*.jpg"),("png files", "*.png"),("all files","*.*")))
-    print(filepath_add)
 
 # DEBUG
 def dropdown_callback(*args):
@@ -240,6 +234,14 @@ def dropdown_callback(*args):
 def save_to_user():
     global all_clothing, dropdown, agl13
     agl13.save_closet(all_clothing,dropdown.get())
+
+def upload(filepath_add):
+    # clear current filepath
+    filepath_add = ""
+    # uploading file (image)
+    filepath_add = filedialog.askopenfilename(filetypes = (("jpeg files", "*.jpg"),("png files", "*.png"),("all files","*.*")))
+    print(filepath_add)
+
 
 
 #def update_lb():
@@ -276,6 +278,7 @@ all_clothing.append(shirt_3)
 
 # END EXAMPLE ====================================
 
+
 # Empty filepath init
 filepath_add=""
 
@@ -288,6 +291,14 @@ w_title = window.title("Outfit Manager")
 # All clothing column
 all_c_frame = tk.Frame(window)
 
+# Add clothing
+# framing for packing together below
+add_c_frame = tk.Frame(window)
+add_c_frame_2 = tk.Frame(window)
+
+# Add clothing TYPE
+# Clothing type frame
+add_c_frame_type = tk.Frame(window)
 
 # Drop down menu
 
@@ -336,13 +347,8 @@ filepath_current = "image.jpg"
 image_current = Image.open(filepath_current).resize((50, 50))        
 image_current = ImageTk.PhotoImage(image_current)
 
+# default no image
 c_prev_image = tk.Label(window, text="No image.", image=image_current)
-
-
-# Add clothing
-# framing for packing together below
-add_c_frame = tk.Frame(window)
-add_c_frame_2 = tk.Frame(window)
 
 # Name frame
 add_c_en_label = tk.Label(add_c_frame_2, text="Name",justify= tk.LEFT)
@@ -368,9 +374,7 @@ add_c_b = tk.Button(
     command=lambda: add_c(add_c_en, add_c_txt)
     )
 
-# Add clothing TYPE
-# Clothing type frame
-add_c_frame_type = tk.Frame(window)
+
 
 v = tk.IntVar(window, 0) # default value is top
 
@@ -381,10 +385,10 @@ add_c_rb_top = tk.Radiobutton(add_c_frame_type, text="Top", variable=v, value=0)
 add_c_rb_bot = tk.Radiobutton(add_c_frame_type, text="Bottom", variable=v, value=1)
 add_c_rb_sh = tk.Radiobutton(add_c_frame_type, text="Shoes", variable=v, value=2)
 
-img_b = tk.Button(add_c_frame_type, text="Image", command=upload)
+img_b = tk.Button(add_c_frame_type, text="Image", command=lambda: upload(filepath_add))
 
 # SAVE 
-closet_save_b = tk.Button(window, text='Save closet', command=save_to_user)
+closet_save_b = tk.Button(window, text='Save closet', command=lambda: save_to_user())
 
 
 # Widget placement
