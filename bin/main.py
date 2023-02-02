@@ -179,7 +179,7 @@ def get_preview():
     # print(clothing_lb.get(c_selection))
     # gets index of selected
     print(c_selection[0])
-    print(all_clothing[c_selection[0]].print_info())
+    print(f"all_clothing[c_selection[0]].print_info()")
 
     # check if no listbox item selected
     if not c_selection:
@@ -319,18 +319,7 @@ clothing_lb = tk.Listbox(all_c_frame, yscrollcommand=w_sb.set, height = 10, widt
 w_sb['command'] = clothing_lb.yview
 
 # DEBUG
-print("ADDING CLOTHING...")
 
-for i, clothing in enumerate(all_clothing):
-    clothing_lb.insert(i, clothing.get_name())
-    print(f"[+] {clothing.get_name()}")
-
-    if clothing.is_clean():
-        clothing_lb.itemconfig(i,{'bg':'Green'})
-    else:
-        clothing_lb.itemconfig(i,{'bg':'Red'})
-
-print("FINISHED ADDING CLOTHING")
 
 # Clean clothing column
 #clean_c_frame = tk.Frame(window)

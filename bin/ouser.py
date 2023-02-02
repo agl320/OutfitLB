@@ -56,8 +56,6 @@ class Closet():
     
     def set_closet(self, clothing_lst_new):
         self.clothing_lst = clothing_lst_new
-    
-    
 
     def __repr__(self):
         return self.name
