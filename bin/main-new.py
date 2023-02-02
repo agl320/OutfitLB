@@ -13,6 +13,47 @@ class AddFrame(tk.Frame):
         # not using super because tkinter uses old way
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
+        
+        # Left type + image frame
+        # Right info frame
+        self.type_frame = tk.Frame(self)
+        self.info_frame = tk.Frame(self)
+
+        # init no image filepath
+        self.filepath_add=""
+
+        self.addType()
+        self.widgetDisplay()
+
+
+    def addType(self):
+        self.type_var = tk.IntVar(self.parent, 0) # default value is top
+        self.add_rb_t = tk.Radiobutton(self.type_frame, text="Top", variable=self.type_var, value=0)
+        self.add_rb_b = tk.Radiobutton(self.type_frame, text="Bottom", variable=self.type_var, value=1)
+        self.add_rb_s = tk.Radiobutton(self.type_frame, text="Shoes", variable=self.type_var, value=2)
+
+        self.add_image_b = tk.Button(self.type_frame, text="Image", command=lambda: self.imageUpload())
+
+    def widgetDisplay(self):
+        self.add_rb_t.grid(row=0,column=0,sticky="W")
+        self.add_rb_b.grid(row=1,column=0,sticky="W")
+        self.add_rb_s.grid(row=2,column=0,sticky="W")
+        # add image (under clothing type)
+        self.add_image_b.grid(row=3,column=0,rowspan=1,sticky="N")
+
+        # MAIN 
+        self.type_frame.grid(row=0, column=0)
+        self.info_frame.grid(row=0, column=1)
+    
+    def imageUpload(self):
+        # clear current filepath
+        self.filepath_add = ""
+        # uploading file (image)
+        self.filepath_add = filedialog.askopenfilename(filetypes = (("jpeg files", "*.jpg"),("png files", "*.png"),("all files","*.*")))
+        
+        # DEBUG
+        print(f">> Updated filepath to: {self.filepath_add}")
+
 
 class PreviewFrame(tk.Frame):
     def __init__(self, parent, all_clothing, clothing_lb, *args, **kwargs):
@@ -23,7 +64,6 @@ class PreviewFrame(tk.Frame):
         self.all_clothing = all_clothing
         self.clothing_lb = clothing_lb
 
-        self.filepath_add=""
         self.filepath_current = "image.jpg"
         self.image_current = Image.open(self.filepath_current).resize((50, 50))        
         self.image_current = ImageTk.PhotoImage(self.image_current)
@@ -157,6 +197,7 @@ class MainApplication(tk.Frame):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
         self.cframe = ClosetFrame(self)
+        self.addframe = AddFrame(self)
         
 
         parent.geometry('650x500')
@@ -165,6 +206,7 @@ class MainApplication(tk.Frame):
         # widget placement
         self.grid(padx=5, pady=5)
         self.cframe.grid(row=0,column=0,columnspan=3,sticky="W")
+        self.addframe.grid(row=1,column=0,rowspan=3,sticky="W")
         
         
 
