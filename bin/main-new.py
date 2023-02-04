@@ -73,10 +73,14 @@ class PreviewFrame(tk.Frame):
         self.prev_image.grid(row=0,column=5,sticky="W")
 
 class ClosetFrame(tk.Frame):
-    def __init__(self, parent, *args, **kwargs):
+    def __init__(self, parent, user, *args, **kwargs):
         # not using super because tkinter uses old way
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
+        self.user = user
+
+        # <> NAV BAR
+        self.navbar_frame = tk.Frame(self.parent)
 
         # <> LEFT LIST AND RIGHT PREVIEW
         self.lb_frame = tk.Frame(self.parent)
@@ -84,6 +88,12 @@ class ClosetFrame(tk.Frame):
         self.addframe = tk.Frame(self.parent)
 
         # <> CLOSET DISPLAY
+        # Dropdown menu
+        self.dropdown_var = tk.StringVar()
+        self.dropdown = ttk.Combobox(self.navbar_frame, textvariable=self.dropdown_var, values=self.user.get_all_closet_id())
+        self.dropdown.current(0)
+        self.dropdown.bind("<<ComboboxSelected>>", self.dropdown_callback)
+
         # Scrollbar and Listbox
         self.sb = tk.Scrollbar(self.lb_frame, orient=tk.VERTICAL) 
         # display current list box of closet
@@ -94,7 +104,7 @@ class ClosetFrame(tk.Frame):
         self.prev_b = tk.Button(self.lb_preview, text='Preview', command=self.callPreview)
         
         # + EXAMPLE DATA
-        self.all_clothing = []
+        self.all_clothing = self.user.get_closet('0').get_all()
         self.example_data()
 
         # <> ADD SECTION
@@ -112,6 +122,29 @@ class ClosetFrame(tk.Frame):
         # <> WIDGET DISPLAY
         self.widgetDisplay()
 
+    #DEBUG
+    def dropdown_callback(self,*args):
+        
+        # UPDATE
+        print("Closet selected: ", self.dropdown.get())
+
+        # CLEAR
+        self.clothing_lb.delete(0,tk.END)
+        self.all_clothing = []
+
+        self.all_clothing = self.user.get_closet(self.dropdown.get()).get_all()
+        
+        for i, clothing in enumerate(self.all_clothing):
+            self.clothing_lb.insert(i, clothing.get_name())
+
+            print(f"[+] {clothing.get_name()}")
+            print(f"\t[>] CLEAN:{clothing.is_clean()}")
+            
+            if clothing.is_clean():
+                self.clothing_lb.itemconfig(i,{'bg':'Green'})
+            else:
+                self.clothing_lb.itemconfig(i,{'bg':'Red'})
+                
     def callPreview(self):
         """
         Creates a preview frame and changes the contents of such preview frame.
@@ -141,7 +174,6 @@ class ClosetFrame(tk.Frame):
             pady=5,
             command=lambda: self.addClothing()
             )
-
 
     def addType(self):
         self.type_var = tk.IntVar(self.parent, 0) # default value is top
@@ -187,7 +219,6 @@ class ClosetFrame(tk.Frame):
         # RESET filepath
         self.filepath_add=""
         
-
         # Check if clean
         if self.clean_var.get():#[].is_clean():
             self.clothing_lb.insert(tk.END, self.add_n_en)
@@ -196,23 +227,27 @@ class ClosetFrame(tk.Frame):
             self.clothing_lb.insert(tk.END, self.add_n_en)
             self.clothing_lb.itemconfig(tk.END,{'bg':'Red'})
         
-    
     # WIDGET DISPLAYING
     # GRID FORMAT
     def widgetDisplay(self):
         """
         MAIN FRAME 
         """
-        self.lb_frame.grid(row=0,column=0,columnspan=3)
-        self.type_frame.grid(row=1, column=0)
-        self.info_frame.grid(row=1, column=1)
+        self.navbar_frame.grid(row=0,column=0,sticky="NW")
+        self.lb_frame.grid(row=1,column=0,columnspan=3)
+        self.type_frame.grid(row=2, column=0)
+        self.info_frame.grid(row=2, column=1)
         #addClothing_en.grid(row=1,column=1,rowspan=1,sticky="N")
         # name 
         self.addframe.grid(row=1,column=0,rowspan=3,sticky="NW")
-        self.lb_preview.grid(row=0,column=3)
+        self.lb_preview.grid(row=1,column=3)
+
         """
         LISTBOX FRAME
         """
+        # ALL CLOTHING FRAME
+        self.dropdown.grid(row=0,column=0,sticky="NW")
+
         # lb_frame
         self.clothing_lb.grid(row=0,column=0,columnspan=3)
         self.sb.grid(row=0,column=2, sticky='NSE')
@@ -223,8 +258,6 @@ class ClosetFrame(tk.Frame):
         """
         INFO ADD FRAME 
         """
-        
-
         self.add_n_l.grid(row=0,column=0,sticky="W")
         self.add_n_en.grid(row=1,column=0,sticky="N")
 
@@ -244,6 +277,8 @@ class ClosetFrame(tk.Frame):
         self.add_rb_s.grid(row=2,column=0,sticky="W")
         # add image (under clothing type)
         self.add_image_b.grid(row=3,column=0,rowspan=1,sticky="N")
+
+        
         
         
 
@@ -270,11 +305,12 @@ class ClosetFrame(tk.Frame):
         print("FINISHED ADDING CLOTHING")
 
 class MainApplication(tk.Frame):
-    def __init__(self, parent, *args, **kwargs):
+    def __init__(self, parent, user, *args, **kwargs):
         # not using super because tkinter uses old way
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
-        self.cframe = ClosetFrame(self)
+        self.user = user
+        self.cframe = ClosetFrame(self, self.user)
 
         parent.geometry('650x500')
         parent.title("Outfit Manager")
@@ -291,7 +327,7 @@ def main():
     agl13.new_closet("DC",'1')
 
     root = tk.Tk()
-    MainApplication(root)
+    MainApplication(root, agl13)
     root.mainloop()
 
 
