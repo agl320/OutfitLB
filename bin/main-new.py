@@ -23,8 +23,21 @@ class AddFrame(tk.Frame):
         self.filepath_add=""
 
         self.addType()
+        self.addInfo()
         self.widgetDisplay()
 
+    def addInfo(self):
+        # Name frame
+        self.add_n_l = tk.Label(self.info_frame, text="Name",justify= tk.LEFT)
+        self.add_n_en = tk.Entry(self.info_frame, width=20)
+
+        # Description frame
+        self.add_d_l = tk.Label(self.info_frame, text="Description",justify= tk.LEFT)
+        self.add_d_txt = tk.Text(self.info_frame, width=15,height=2)
+
+        # Clean? checklist w/ Description frame
+        clean_var =  tk.IntVar()
+        self.add_clean_b = tk.Checkbutton(self.info_frame, text = "Clean?", variable=clean_var)
 
     def addType(self):
         self.type_var = tk.IntVar(self.parent, 0) # default value is top
@@ -35,6 +48,18 @@ class AddFrame(tk.Frame):
         self.add_image_b = tk.Button(self.type_frame, text="Image", command=lambda: self.imageUpload())
 
     def widgetDisplay(self):
+        # INFO FRAME
+        #add_c_en.grid(row=1,column=1,rowspan=1,sticky="N")
+        # name 
+        self.add_n_l.grid(row=0,column=0,sticky="W")
+        self.add_n_en.grid(row=1,column=0,sticky="N")
+
+        # description
+        self.add_d_l.grid(row=2,column=0,sticky="W")
+        self.add_d_txt.grid(row=3,column=0,rowspan=1,sticky="N")
+        self.add_clean_b.grid(row=4,column=0,rowspan=1,sticky="N")
+
+        # TYPE FRAMe
         self.add_rb_t.grid(row=0,column=0,sticky="W")
         self.add_rb_b.grid(row=1,column=0,sticky="W")
         self.add_rb_s.grid(row=2,column=0,sticky="W")
