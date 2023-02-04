@@ -124,7 +124,6 @@ class ClosetFrame(tk.Frame):
 
     #DEBUG
     def dropdown_callback(self,*args):
-        
         # UPDATE
         print("Closet selected: ", self.dropdown.get())
 
@@ -144,6 +143,9 @@ class ClosetFrame(tk.Frame):
                 self.clothing_lb.itemconfig(i,{'bg':'Green'})
             else:
                 self.clothing_lb.itemconfig(i,{'bg':'Red'})
+
+    def save_to_user(self):
+        self.user.save_closet(self.all_clothing,self.dropdown.get())
                 
     def callPreview(self):
         """
@@ -183,6 +185,9 @@ class ClosetFrame(tk.Frame):
 
         self.add_image_b = tk.Button(self.type_frame, text="Image", command=lambda: self.imageUpload())
 
+        # SAVE 
+        self.closet_save_b = tk.Button(self.type_frame, text='Save closet', command=lambda: self.save_to_user())
+            
     def imageUpload(self):
         # clear current filepath
         self.filepath_add = ""
@@ -277,6 +282,8 @@ class ClosetFrame(tk.Frame):
         self.add_rb_s.grid(row=2,column=0,sticky="W")
         # add image (under clothing type)
         self.add_image_b.grid(row=3,column=0,rowspan=1,sticky="N")
+        
+        self.closet_save_b.grid(row=6,column=0)
 
         
         
