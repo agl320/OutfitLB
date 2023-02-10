@@ -25,6 +25,15 @@ class User():
     def get_all_closet_id(self):
         id_list = list(self.closet_lst.keys())
         return id_list.copy()
+    
+    def get_all_closet_comb(self):
+        name_lst = list(self.closet_lst.values())
+        id_list = list(self.closet_lst.keys())
+
+        for i in range(len(name_lst)):
+            name_lst[i] = str(name_lst[i]) + f" {id_list[i]}"
+
+        return name_lst
 
     def view_all_closets(self):
         print(self.closet_lst)

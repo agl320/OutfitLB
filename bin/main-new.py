@@ -7,11 +7,16 @@ from PIL import Image, ImageTk
 
 # removal of prefix
 from ouser import *
-
+"""
+class ClosetPopUp(tk.Frame):
+    def __init__(self, parent):
+        self.top = tk.Toplevel(parent)
+        self.l = tk.Label(self.top, text="Closet Name")
+"""
 class PreviewFrame(tk.Frame):
     def __init__(self, parent, all_clothing, clothing_lb, *args, **kwargs):
         # not using super because tkinter uses old way
-        tk.Frame.__init__(self, parent, *args, **kwargs)
+        tk.Frame.__init__(self, parent, width=5, *args, **kwargs)
         self.parent = parent
 
         self.all_clothing = all_clothing
@@ -47,21 +52,19 @@ class PreviewFrame(tk.Frame):
             print(">> None selected.")
             self.prev_label_var.set("None selected.")
             self.prev_label = tk.Label(self.parent, textvariable=self.prev_label_var, font=("Helvetica", 10),justify= tk.LEFT) 
-
             self.prev_image = tk.Label(self.parent, text="No image.")
         else:
             print(">> Selected")
             #strvar.set(clothing_lb.get(c_selection))
             self.prev_label_var.set(self.all_clothing[self.prev_select[0]].get_info())
-            self.prev_label = tk.Label(self.parent, textvariable=self.prev_label_var, font=("Helvetica", 10),justify= tk.LEFT) 
-
+            self.prev_label['textvariable']=self.prev_label_var
             # getting and displaying current clothing image
             self.filepath_current = self.all_clothing[self.prev_select[0]].get_image()
             if not self.filepath_current or self.filepath_current.isspace():
                 self.filepath_current = "image.jpg"
                 print(">> No image for current")
 
-            self.image_current = Image.open(self.filepath_current).resize((50, 50))
+            self.image_current = Image.open(self.filepath_current).resize((100, 100))
             self.image_current = ImageTk.PhotoImage(self.image_current)
             self.prev_image.configure(image=self.image_current)
             # prevent garbage collection
@@ -69,8 +72,8 @@ class PreviewFrame(tk.Frame):
 
     def widgetDisplay(self):
         # clothing preview (right of all clothing list)
-        self.prev_label.grid(row=0,column=4,sticky="W")
-        self.prev_image.grid(row=0,column=5,sticky="W")
+        self.prev_label.grid(row=1,column=4,sticky="W")
+        self.prev_image.grid(row=0,column=4,sticky="W")
 
 class ClosetFrame(tk.Frame):
     def __init__(self, parent, user, *args, **kwargs):
@@ -87,12 +90,7 @@ class ClosetFrame(tk.Frame):
         self.lb_preview = tk.Frame(self.parent)
         self.addframe = tk.Frame(self.parent)
 
-        # <> CLOSET DISPLAY
-        # Dropdown menu
-        self.dropdown_var = tk.StringVar()
-        self.dropdown = ttk.Combobox(self.navbar_frame, textvariable=self.dropdown_var, values=self.user.get_all_closet_id())
-        self.dropdown.current(0)
-        self.dropdown.bind("<<ComboboxSelected>>", self.dropdown_callback)
+        self.navBar()        
 
         # Scrollbar and Listbox
         self.sb = tk.Scrollbar(self.lb_frame, orient=tk.VERTICAL) 
@@ -122,6 +120,56 @@ class ClosetFrame(tk.Frame):
         # <> WIDGET DISPLAY
         self.widgetDisplay()
 
+    def navBar(self):
+        # <> CLOSET DISPLAY
+        # Dropdown menu
+        self.dropdown_var = tk.StringVar()
+        self.dropdown = ttk.Combobox(self.navbar_frame, textvariable=self.dropdown_var, values=self.user.get_all_closet_comb())
+        self.dropdown.current(0)
+        self.dropdown.bind("<<ComboboxSelected>>", self.dropdown_callback)
+
+        # Add closet
+        self.add_closet_b = tk.Button(self.navbar_frame, text="New closet", command=lambda: self.addCloset_info())
+        print(f"All closet name: {self.user.get_all_closet_name()}")
+        print(f"All closet id: {self.user.get_all_closet_id()}")
+        print(f"First closet: {self.user.get_closet('0')}")
+
+    def addCloset_info(self):
+        self.add_closet_b.destroy()
+
+        add_c_name = tk.StringVar()
+        add_c_name.set("Closet-Name")
+        add_c_id = tk.IntVar()
+        add_c_id.set("ID")
+        self.add_closet_name = tk.Entry(self.navbar_frame, textvariable=add_c_name, width=20)
+        self.add_closet_id = tk.Entry(self.navbar_frame, textvariable=add_c_id, width=10)
+        self.add_closet_b2 = tk.Button(self.navbar_frame, text="Add", command=lambda: self.addCloset())
+
+        self.add_closet_name.grid(row=0,column=1,sticky="NW")
+        self.add_closet_id.grid(row=0,column=2,sticky="NW")
+        self.add_closet_b2.grid(row=0,column=3,sticky="NW")
+    
+    def addCloset(self):
+        print(f"Added new closet: {self.add_closet_name.get()}, {self.add_closet_id.get()}")
+        self.user.new_closet(self.add_closet_name.get(),self.add_closet_id.get())
+
+        # DELETE AND REVERT TO INITIAL NAVBAR
+        self.add_closet_name.destroy()
+        self.add_closet_id.destroy()
+        self.add_closet_b2.destroy()
+
+        # Add closet
+        self.add_closet_b = tk.Button(self.navbar_frame, text="New closet", command=lambda: self.addCloset_info())
+        self.add_closet_b.grid(row=0,column=1,sticky="NW")
+
+        # Update dropdown menu
+        self.dropdown['values'] = self.user.get_all_closet_comb()
+
+        print(f"All closet name: {self.user.get_all_closet_name()}")
+        print(f"All closet id: {self.user.get_all_closet_id()}")
+        print(f"First closet: {self.user.get_closet('0')}")
+
+
     #DEBUG
     def dropdown_callback(self,*args):
         # UPDATE
@@ -131,7 +179,9 @@ class ClosetFrame(tk.Frame):
         self.clothing_lb.delete(0,tk.END)
         self.all_clothing = []
 
-        self.all_clothing = self.user.get_closet(self.dropdown.get()).get_all()
+        # Get closet by splitting dropdown value and taking the id part since first element of 
+        # dropdown.get() since "name + id"
+        self.all_clothing = self.user.get_closet(self.dropdown.get().split()[1]).get_all()
         
         for i, clothing in enumerate(self.all_clothing):
             self.clothing_lb.insert(i, clothing.get_name())
@@ -145,7 +195,7 @@ class ClosetFrame(tk.Frame):
                 self.clothing_lb.itemconfig(i,{'bg':'Red'})
 
     def save_to_user(self):
-        self.user.save_closet(self.all_clothing,self.dropdown.get())
+        self.user.save_closet(self.all_clothing,self.dropdown.get().split()[1])
                 
     def callPreview(self):
         """
@@ -238,7 +288,7 @@ class ClosetFrame(tk.Frame):
         """
         MAIN FRAME 
         """
-        self.navbar_frame.grid(row=0,column=0,sticky="NW")
+        self.navbar_frame.grid(row=0,column=0,columnspan=6,sticky="NW")
         self.lb_frame.grid(row=1,column=0,columnspan=3)
         self.type_frame.grid(row=2, column=0)
         self.info_frame.grid(row=2, column=1)
@@ -252,6 +302,7 @@ class ClosetFrame(tk.Frame):
         """
         # ALL CLOTHING FRAME
         self.dropdown.grid(row=0,column=0,sticky="NW")
+        self.add_closet_b.grid(row=0,column=1,sticky="NW")
 
         # lb_frame
         self.clothing_lb.grid(row=0,column=0,columnspan=3)
@@ -285,9 +336,6 @@ class ClosetFrame(tk.Frame):
         
         self.closet_save_b.grid(row=6,column=0)
 
-        
-        
-        
 
     def example_data(self):
         shirt_1 = Top("Blue Shirt", "Blue shirt I bought at Wendy's")
@@ -331,7 +379,7 @@ class MainApplication(tk.Frame):
 def main(): 
     agl13 = User("GH", "Andrew", "agl13")
     agl13.new_closet("AC",'0')
-    agl13.new_closet("DC",'1')
+    agl13.new_closet("Buster-Wolf",'1')
 
     root = tk.Tk()
     MainApplication(root, agl13)
