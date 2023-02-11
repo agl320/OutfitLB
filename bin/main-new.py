@@ -251,35 +251,35 @@ class ClosetFrame(tk.Frame):
     def addClothing(self):
 
         # get name and description 
-        self.add_n_en = self.add_n_en.get()
-        self.add_d_txt = self.add_d_txt.get("1.0",tk.END).replace('\n',' ')
+        self.add_n_var = self.add_n_en.get()
+        self.add_d_var = self.add_d_txt.get("1.0",tk.END).replace('\n',' ')
         #new_c_name = str(input())
 
         # If empty string, use no name
-        if not self.add_n_en or self.add_n_en.isspace():
-            self.add_n_en = "No name"
+        if not self.add_n_var or self.add_n_var.isspace():
+            self.add_n_var = "No name"
 
         # debug print
-        print(f"[+ type:{self.type_var.get()}] {self.add_n_en}")
+        print(f"[+ type:{self.type_var.get()}] {self.add_n_var}")
 
         # Adding to clothing list -> type check
         match self.type_var.get():
             case 0:
-                self.all_clothing.append(Top(self.add_n_en, self.add_d_txt, "Custom", clean=self.clean_var.get(), filepath=self.filepath_add))
+                self.all_clothing.append(Top(self.add_n_var, self.add_d_var, "Custom", clean=self.clean_var.get(), filepath=self.filepath_add))
             case 1:
-                self.all_clothing.append(Bottom(self.add_n_en, self.add_d_txt, "Custom", clean=self.clean_var.get(), filepath=self.filepath_add))
+                self.all_clothing.append(Bottom(self.add_n_var, self.add_d_var, "Custom", clean=self.clean_var.get(), filepath=self.filepath_add))
             case 2:
-                self.all_clothing.append(Shoes(self.add_n_en, self.add_d_txt, "Custom", clean=self.clean_var.get(), filepath=self.filepath_add))
+                self.all_clothing.append(Shoes(self.add_n_var, self.add_d_var, "Custom", clean=self.clean_var.get(), filepath=self.filepath_add))
         
         # RESET filepath
         self.filepath_add=""
         
         # Check if clean
         if self.clean_var.get():#[].is_clean():
-            self.clothing_lb.insert(tk.END, self.add_n_en)
+            self.clothing_lb.insert(tk.END, self.add_n_var)
             self.clothing_lb.itemconfig(tk.END,{'bg':'Green'})
         else:
-            self.clothing_lb.insert(tk.END, self.add_n_en)
+            self.clothing_lb.insert(tk.END, self.add_n_var)
             self.clothing_lb.itemconfig(tk.END,{'bg':'Red'})
         
     # WIDGET DISPLAYING
