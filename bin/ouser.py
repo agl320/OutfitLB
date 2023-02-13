@@ -8,6 +8,9 @@ class User():
     def new_closet(self, name, ID, desc=""):
         self.closet_lst[ID]=Closet(name, desc)
 
+    def delete_closet(self, ID):
+        self.closet_lst.pop(ID, None)
+
     def get_closet(self, ID):
         return self.closet_lst[ID]
 
