@@ -58,12 +58,12 @@ class PreviewFrame(tk.Frame):
         print(self.all_clothing[self.prev_select[0]].print_info())
         # check if no listbox item selected
         if not self.prev_select:
-            print(">> None selected.")
+            print("[!] None selected.")
             self.prev_label_var.set("None selected.")
             self.prev_label = tk.Label(self.parent, textvariable=self.prev_label_var, font=("Helvetica", 10),justify= tk.LEFT) 
             self.prev_image = tk.Label(self.parent, text="No image.")
         else:
-            print(">> Selected")
+            print("[!] Selected")
             #strvar.set(clothing_lb.get(c_selection))
             self.prev_label_var.set(self.all_clothing[self.prev_select[0]].get_info())
             self.prev_label['textvariable']=self.prev_label_var
@@ -71,7 +71,7 @@ class PreviewFrame(tk.Frame):
             self.filepath_current = self.all_clothing[self.prev_select[0]].get_image()
             if not self.filepath_current or self.filepath_current.isspace():
                 self.filepath_current = "image.jpg"
-                print(">> No image for current")
+                print("[!] No image for current")
 
             self.image_current = Image.open(self.filepath_current).resize((100, 100))
             self.image_current = ImageTk.PhotoImage(self.image_current)
@@ -139,9 +139,6 @@ class ClosetFrame(tk.Frame):
 
         # Add closet
         self.add_closet_b = tk.Button(self.navbar_frame, text="New closet", command=lambda: self.addCloset_expand())
-        print(f"All closet name: {self.user.get_all_closet_name()}")
-        print(f"All closet id: {self.user.get_all_closet_id()}")
-        print(f"First closet: {self.user.get_closet('0')}")
 
         # Delete closet
         self.delete_closet_b = tk.Button(self.navbar_frame, text="Delete", command=lambda: self.deleteCloset())
@@ -163,7 +160,7 @@ class ClosetFrame(tk.Frame):
         
     
     def addCloset(self):
-        print(f"Added new closet: {self.add_closet_name.get()}, {self.add_closet_id.get()}")
+        print(f"[+] Added new closet: {self.add_closet_name.get()}, {self.add_closet_id.get()}")
         self.user.new_closet(self.add_closet_name.get(),self.add_closet_id.get())
 
         # DELETE AND REVERT TO INITIAL NAVBAR
@@ -178,14 +175,15 @@ class ClosetFrame(tk.Frame):
         # Update dropdown menu
         self.dropdown['values'] = self.user.get_all_closet_comb()
 
-        print(f"All closet name: {self.user.get_all_closet_name()}")
-        print(f"All closet id: {self.user.get_all_closet_id()}")
-        print(f"First closet: {self.user.get_closet('0')}")
+        print(f"[=] All closet name: {self.user.get_all_closet_name()}")
+        print(f"[=] All closet id: {self.user.get_all_closet_id()}")
+        #print(f"First closet: {self.user.get_closet('0')}")
 
     def deleteCloset(self):
         self.mb_confirm = tk.messagebox.askyesno(title="Delete confirmation", message=f"Are you sure you want to delete closet: {self.dropdown.get()}")
         
         if self.mb_confirm:
+            print(f"[X] Deleted closet: {self.dropdown.get().split()[1]}")
             self.user.delete_closet(self.dropdown.get().split()[1])
             # Update dropdown menu
             self.dropdown['values'] = self.user.get_all_closet_comb()
@@ -197,7 +195,7 @@ class ClosetFrame(tk.Frame):
     #DEBUG
     def dropdown_callback(self,*args):
         # UPDATE
-        print("Closet selected: ", self.dropdown.get())
+        print("[>] Closet selected: ", self.dropdown.get())
 
         # CLEAR
         self.clothing_lb.delete(0,tk.END)
@@ -211,7 +209,7 @@ class ClosetFrame(tk.Frame):
             self.clothing_lb.insert(i, clothing.get_name())
 
             print(f"[+] {clothing.get_name()}")
-            print(f"\t[>] CLEAN:{clothing.is_clean()}")
+            print(f"\t[=] CLEAN:{clothing.is_clean()}")
             
             if clothing.is_clean():
                 self.clothing_lb.itemconfig(i,{'bg':'Green'})
@@ -276,7 +274,7 @@ class ClosetFrame(tk.Frame):
         # check if valid closet
         try:
             if self.user.get_closet(self.dropdown.get().split()[1]):
-                print("Closet exists")
+                print("[!] Closet exists")
             # get name and description 
             self.add_n_var = self.add_n_en.get()
             self.add_d_var = self.add_d_txt.get("1.0",tk.END).replace('\n',' ')
@@ -310,7 +308,7 @@ class ClosetFrame(tk.Frame):
                 self.clothing_lb.itemconfig(tk.END,{'bg':'Red'})
         except:
             tk.messagebox.showwarning(title="Closet error", message="Closet does not exist!")
-            print("Closet does not exist")
+            print("[!] Closet does not exist")
         
     # WIDGET DISPLAYING
     # GRID FORMAT
