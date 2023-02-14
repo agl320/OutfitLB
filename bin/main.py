@@ -14,6 +14,27 @@ class ClosetPopUp(tk.Frame):
         self.l = tk.Label(self.top, text="Closet Name")
 """
 
+class SwitchFrame(tk.Frame):
+    def __init__(self, parent, all_frames, *args, **kwargs):
+        tk.Frame.__init__(self, parent, *args, **kwargs)
+        self.parent = parent
+
+        self.all_frames = all_frames
+
+        # switch to closet/outfit
+        self.switch_c_b = tk.Button(self.parent, text='Closets', command=lambda: self.showFrame('CFRAME'))
+        # switch to closet/outfit
+        self.switch_o_b = tk.Button(self.parent, text='Outfits', command=lambda: self.showFrame('OFRAME'))
+
+        self.switch_c_b.grid(row=0,column=0,sticky="n")
+        self.switch_o_b.grid(row=1,column=0,sticky="n")
+
+    def showFrame(self, page_name):
+        current_frame = self.all_frames[page_name]
+        current_frame.tkraise()
+
+
+
 class OutfitFrame(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
@@ -89,7 +110,7 @@ class ClosetFrame(tk.Frame):
         # not using super because tkinter uses old way
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
-        self.user = user
+        self.user = user     
 
         # <> NAV BAR
         self.navbar_frame = tk.Frame(self)
@@ -104,7 +125,7 @@ class ClosetFrame(tk.Frame):
         # Scrollbar and Listbox
         self.sb = tk.Scrollbar(self.lb_frame, orient=tk.VERTICAL) 
         # display current list box of closet
-        self.clothing_lb = tk.Listbox(self.lb_frame, yscrollcommand = self.sb.set, height = 10, width = 25,activestyle = 'dotbox',font = ("Helvetica",10),fg = "white")
+        self.clothing_lb = tk.Listbox(self.lb_frame, yscrollcommand = self.sb.set, height = 10, width = 30,activestyle = 'dotbox',font = ("Helvetica",10),fg = "white")
         self.sb['command'] = self.clothing_lb.yview
         
         # <> PREVIEW BUTTON
@@ -117,8 +138,8 @@ class ClosetFrame(tk.Frame):
         # <> ADD SECTION
          # Left type + image frame
         # Right info frame
-        self.type_frame = tk.Frame(self)
-        self.info_frame = tk.Frame(self)
+        self.type_frame = tk.Frame(self.addframe)
+        self.info_frame = tk.Frame(self.addframe)
 
         # init no image filepath
         self.filepath_add=""
@@ -317,13 +338,13 @@ class ClosetFrame(tk.Frame):
         MAIN FRAME 
         """
         self.navbar_frame.grid(row=0,column=0,columnspan=6,sticky="NW")
-        self.lb_frame.grid(row=1,column=0,columnspan=3)
-        self.type_frame.grid(row=2, column=0)
-        self.info_frame.grid(row=2, column=1)
+        self.lb_frame.grid(row=1,column=0,columnspan=3,sticky="NW")
+        self.type_frame.grid(row=2, column=0,sticky="NW")
+        self.info_frame.grid(row=2, column=2,sticky="NW")
         #addClothing_en.grid(row=1,column=1,rowspan=1,sticky="N")
         # name 
-        self.addframe.grid(row=1,column=0,rowspan=3,sticky="NW")
-        self.lb_preview.grid(row=1,column=3)
+        self.addframe.grid(row=2,column=0,rowspan=6,columnspan=6,sticky="NW")
+        self.lb_preview.grid(row=1,column=3,sticky="NW")
 
         """
         LISTBOX FRAME
@@ -334,36 +355,36 @@ class ClosetFrame(tk.Frame):
         self.delete_closet_b.grid(row=0,column=4,sticky="NW")
 
         # lb_frame
-        self.clothing_lb.grid(row=0,column=0,columnspan=3)
+        self.clothing_lb.grid(row=0,column=0,columnspan=3,sticky="NW")
         self.sb.grid(row=0,column=2, sticky='NSE')
 
         # lb_preview
-        self.prev_b.grid(row=0,column=1,sticky="W")
+        self.prev_b.grid(row=0,column=1,sticky="NW")
 
         """
         INFO ADD FRAME 
         """
-        self.add_n_l.grid(row=0,column=0,sticky="W")
-        self.add_n_en.grid(row=1,column=0,sticky="N")
+        self.add_n_l.grid(row=0,column=0,sticky="NW")
+        self.add_n_en.grid(row=1,column=0,sticky="NW")
 
         # description
-        self.add_d_l.grid(row=2,column=0,sticky="W")
-        self.add_d_txt.grid(row=3,column=0,rowspan=1,sticky="N")
-        self.add_clean_b.grid(row=4,column=0,rowspan=1,sticky="N")
+        self.add_d_l.grid(row=2,column=0,sticky="NW")
+        self.add_d_txt.grid(row=3,column=0,rowspan=1,sticky="NW")
+        self.add_clean_b.grid(row=4,column=0,rowspan=1,sticky="NW")
 
          # button submit
-        self.add_sm_b.grid(row=5,column=0, sticky="S")
+        self.add_sm_b.grid(row=5,column=0, sticky="NW")
         
         """
         TYPE FRAME 
         """
-        self.add_rb_t.grid(row=0,column=0,sticky="W")
-        self.add_rb_b.grid(row=1,column=0,sticky="W")
-        self.add_rb_s.grid(row=2,column=0,sticky="W")
+        self.add_rb_t.grid(row=0,column=0,sticky="NW")
+        self.add_rb_b.grid(row=1,column=0,sticky="NW")
+        self.add_rb_s.grid(row=2,column=0,sticky="NW")
         # add image (under clothing type)
-        self.add_image_b.grid(row=3,column=0,rowspan=1,sticky="N")
+        self.add_image_b.grid(row=3,column=0,rowspan=1,sticky="NW")
         
-        self.closet_save_b.grid(row=6,column=0)
+        self.closet_save_b.grid(row=6,column=0,sticky="NW")
 
 
     def example_data(self):
@@ -394,9 +415,14 @@ class MainApplication(tk.Frame):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
         self.user = user
-        self.cframe = ClosetFrame(self, self.user)
-        self.oframe = OutfitFrame(self)
 
+        #left option, right action
+        self.optionframe = tk.Frame(self)
+        self.actionframe = tk.Frame(self)
+
+        # ACTION FRAME
+        self.cframe = ClosetFrame(self.actionframe, self.user)
+        self.oframe = OutfitFrame(self.actionframe)
 
         parent.geometry('650x500')
         parent.title("Outfit Manager")
@@ -406,12 +432,19 @@ class MainApplication(tk.Frame):
         self.all_frames['CFRAME'] = self.cframe
         self.all_frames['OFRAME'] = self.oframe 
 
+        # OPTION FRAME
+        self.switchframe = SwitchFrame(self.optionframe, self.all_frames)
+
         # widget placement
         self.grid(padx=5, pady=5)
         self.cframe.grid(row=0,column=0,sticky="news")
         self.oframe.grid(row=0,column=0,sticky="news")
-        self.parent.rowconfigure(0, weight=1)
-        self.parent.columnconfigure(0, weight=1)
+
+        # MAIN
+        self.optionframe.grid(row=0,column=0,sticky="nw")
+        self.actionframe.grid(row=0,column=1,sticky="nw")
+        self.actionframe.rowconfigure(0, weight=1)
+        self.actionframe.columnconfigure(0, weight=1)
 
         # SHOW FRAME
         self.showFrame('CFRAME')
