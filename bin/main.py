@@ -14,6 +14,8 @@ class ClosetPopUp(tk.Frame):
         self.l = tk.Label(self.top, text="Closet Name")
 """
 
+
+
 class SwitchFrame(tk.Frame):
     def __init__(self, parent, all_frames, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
@@ -32,8 +34,6 @@ class SwitchFrame(tk.Frame):
     def showFrame(self, page_name):
         current_frame = self.all_frames[page_name]
         current_frame.tkraise()
-
-
 
 class OutfitFrame(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -120,6 +120,8 @@ class ClosetFrame(tk.Frame):
         self.lb_preview = tk.Frame(self)
         self.addframe = tk.Frame(self)
 
+        self.lb_button_frame = tk.Frame(self.lb_preview)
+
         self.navBar()        
 
         # Scrollbar and Listbox
@@ -129,7 +131,8 @@ class ClosetFrame(tk.Frame):
         self.sb['command'] = self.clothing_lb.yview
         
         # <> PREVIEW BUTTON
-        self.prev_b = tk.Button(self.lb_preview, text='Preview', command=self.callPreview)
+        self.prev_b = tk.Button(self.lb_button_frame, text='Preview', command=self.callPreview)
+        self.edit_current_b = tk.Button(self.lb_button_frame, text="Edit", command=lambda: self.editCurrent())
         
         # + EXAMPLE DATA
         self.all_clothing = self.user.get_closet('0').get_all()
@@ -200,6 +203,8 @@ class ClosetFrame(tk.Frame):
         print(f"[=] All closet id: {self.user.get_all_closet_id()}")
         #print(f"First closet: {self.user.get_closet('0')}")
 
+        
+
     def deleteCloset(self):
         self.mb_confirm = tk.messagebox.askyesno(title="Delete confirmation", message=f"Are you sure you want to delete closet: {self.dropdown.get()}")
         
@@ -246,7 +251,65 @@ class ClosetFrame(tk.Frame):
         Then places the preview frame using grid. 
         """
         self.previewframe = PreviewFrame(self.lb_preview, self.all_clothing, self.clothing_lb) # maybe self.lb_preview?
-        self.previewframe.grid(row=0,column=2,sticky="W")
+        self.previewframe.grid(row=0,column=2,sticky="NW")
+    
+    
+    def editCurrent(self):
+        self.edit_window = tk.Toplevel(self.lb_preview)
+        # grab_set() to isolate actions to window
+        self.edit_window.grab_set()
+
+        # Edit name frame
+        self.edit_n_l = tk.Label(self.edit_window, text="Name",justify= tk.LEFT)
+
+        self.edit_n_var = tk.StringVar()
+        self.edit_n_var.set("")
+        self.edit_n_en = tk.Entry(self.edit_window, textvariable=self.edit_n_var, width=40)
+
+        # Edit description frame
+        self.edit_d_l = tk.Label(self.edit_window, text="Description",justify= tk.LEFT)
+
+        # Text has no textvariable attribute, thus must use regular strings
+        self.edit_d_var = ""
+        self.edit_d_txt = tk.Text(self.edit_window,  width=40,height=10)
+        self.edit_d_txt.insert(tk.INSERT, self.edit_d_var)
+
+        # Clean? checklist w/ Description frame
+        self.edit_clean_var =  tk.IntVar()
+        self.edit_clean_b = tk.Checkbutton(self.edit_window, text = "Clean?", variable=self.edit_clean_var)
+
+        # gets selected item in listbox
+        self.edit_select = self.clothing_lb.curselection()
+
+        if not self.edit_select:
+            print("[!] None selected.")
+            self.edit_n_var.set("None selected.")
+        else:
+            print("[!] Selected")
+            #strvar.set(clothing_lb.get(c_selection))
+            self.edit_n_var.set(self.all_clothing[self.edit_select[0]].get_name())
+            self.edit_d_var = self.all_clothing[self.edit_select[0]].get_desc()
+            self.edit_d_txt.insert(tk.INSERT, self.edit_d_var)
+            # getting and displaying current clothing image
+            #self.filepath_current = self.all_clothing[self.prev_select[0]].get_image()
+            #if not self.filepath_current or self.filepath_current.isspace():
+            #    self.filepath_current = "image.jpg"
+            #    print("[!] No image for current")
+
+            # SAVE BUTTON -> UPDATE ALL_CLOTHING
+            
+
+        self.edit_n_l.grid(row=0,column=0,sticky="NW")
+        self.edit_n_en.grid(row=1,column=0,sticky="NW")
+
+        # description
+        self.edit_d_l.grid(row=2,column=0,sticky="NW")
+        self.edit_d_txt.grid(row=3,column=0,rowspan=1,sticky="NW")
+
+        # clean button
+        self.edit_clean_b.grid(row=4,column=0,rowspan=1,sticky="NW")
+
+
 
     def addInfo(self):
         # Name frame
@@ -341,6 +404,8 @@ class ClosetFrame(tk.Frame):
         self.lb_frame.grid(row=1,column=0,columnspan=3,sticky="NW")
         self.type_frame.grid(row=2, column=0,sticky="NW")
         self.info_frame.grid(row=2, column=2,sticky="NW")
+
+        self.lb_button_frame.grid(row=0,column=0,sticky="NW")
         #addClothing_en.grid(row=1,column=1,rowspan=1,sticky="N")
         # name 
         self.addframe.grid(row=2,column=0,rowspan=6,columnspan=6,sticky="NW")
@@ -359,7 +424,8 @@ class ClosetFrame(tk.Frame):
         self.sb.grid(row=0,column=2, sticky='NSE')
 
         # lb_preview
-        self.prev_b.grid(row=0,column=1,sticky="NW")
+        self.prev_b.grid(row=0,column=0,sticky="NW")
+        self.edit_current_b.grid(row=1,column=0,sticky="NW")
 
         """
         INFO ADD FRAME 

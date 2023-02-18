@@ -103,6 +103,9 @@ class Clothing():
         info_str = f"Name: {self.name}\nDescription: {self.desc}"
         return info_str
     
+    def get_desc(self):
+        return self.desc
+    
     # sets image file path for clothing
     def set_image(self, filepath):
         self.filepath = filepath
