@@ -182,7 +182,7 @@ class ClosetFrame(tk.Frame):
     
     def addCloset(self):
         print(f"[+] Added new closet: {self.add_closet_name.get()}, {self.add_closet_id.get()}")
-        self.user.new_closet(self.add_closet_name.get(),self.add_closet_id.get())
+        self.user.new_closet(self.add_closet_name.get().replace(' ','-'),self.add_closet_id.get().replace(' ','-'))
 
         # DELETE AND REVERT TO INITIAL NAVBAR
         self.add_closet_name.destroy()
