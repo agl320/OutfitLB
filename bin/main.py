@@ -14,8 +14,6 @@ class ClosetPopUp(tk.Frame):
         self.l = tk.Label(self.top, text="Closet Name")
 """
 
-
-
 class SwitchFrame(tk.Frame):
     def __init__(self, parent, all_frames, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
@@ -87,7 +85,7 @@ class PreviewFrame(tk.Frame):
             print("[!] Selected")
             #strvar.set(clothing_lb.get(c_selection))
             self.prev_label_var.set(self.all_clothing[self.prev_select[0]].get_info())
-            self.prev_label['textvariable']=self.prev_label_var
+            self.prev_label.config(textvariable=self.prev_label_var)
             # getting and displaying current clothing image
             self.filepath_current = self.all_clothing[self.prev_select[0]].get_image()
             if not self.filepath_current or self.filepath_current.isspace():
@@ -187,7 +185,6 @@ class ClosetFrame(tk.Frame):
         self.add_closet_b2.grid(row=0,column=3,sticky="NW")
         self.back_closet_b.grid(row=0,column=4,sticky="NW")
         
-    
     def addCloset(self):
         print(f"[+] Added new closet: {self.add_closet_name.get()}, {self.add_closet_id.get()}")
         self.user.new_closet(self.add_closet_name.get().replace(' ','-'),self.add_closet_id.get().replace(' ','-'))
@@ -209,8 +206,6 @@ class ClosetFrame(tk.Frame):
         print(f"[=] All closet id: {self.user.get_all_closet_id()}")
         #print(f"First closet: {self.user.get_closet('0')}")
 
-        
-
     def deleteCloset(self):
         self.mb_confirm = tk.messagebox.askyesno(title="Delete confirmation", message=f"Are you sure you want to delete closet: {self.dropdown.get()}")
         
@@ -222,7 +217,6 @@ class ClosetFrame(tk.Frame):
             # CLEAR
             self.clothing_lb.delete(0,tk.END)
             self.dropdown.set('')
-
 
     #DEBUG
     def dropdown_callback(self,*args):
@@ -237,18 +231,7 @@ class ClosetFrame(tk.Frame):
         # dropdown.get() since "name + id"
         self.all_clothing = self.user.get_closet(self.dropdown.get().split()[1]).get_all()
         
-        for i, clothing in enumerate(self.all_clothing):
-            self.clothing_lb.insert(i, clothing.get_name())
-
-            print(f"[+] {clothing.get_name()}")
-            print(f"\t[=] CLEAN:{clothing.is_clean()}")
-            
-            if clothing.is_clean():
-                self.clothing_lb.itemconfig(i,{'bg':'Green'})
-            else:
-                self.clothing_lb.itemconfig(i,{'bg':'Red'})
-
-        
+        self.updateClothingList()
 
     def save_to_user(self):
         self.user.save_closet(self.all_clothing,self.dropdown.get().split()[1])
@@ -260,7 +243,6 @@ class ClosetFrame(tk.Frame):
         """
         self.previewframe = PreviewFrame(self.lb_preview, self.all_clothing, self.clothing_lb) # maybe self.lb_preview?
         self.previewframe.grid(row=0,column=2,sticky="NW")
-    
     
     def editCurrent(self):
         self.edit_window = tk.Toplevel(self.lb_preview)
@@ -280,8 +262,16 @@ class ClosetFrame(tk.Frame):
 
         # Text has no textvariable attribute, thus must use regular strings
         self.edit_d_var = ""
-        self.edit_d_txt = tk.Text(self.edit_window,  width=40,height=10)
+        self.edit_d_txt = tk.Text(self.edit_window,  width=30,height=10)
         self.edit_d_txt.insert(tk.INSERT, self.edit_d_var)
+
+        # TYPE 
+        self.edit_type_var = tk.IntVar(self.edit_window, 0) # default value is top
+        self.edit_rb_t = tk.Radiobutton(self.edit_window, text="Top", variable=self.edit_type_var, value=0)
+        self.edit_rb_b = tk.Radiobutton(self.edit_window, text="Bottom", variable=self.edit_type_var, value=1)
+        self.edit_rb_s = tk.Radiobutton(self.edit_window, text="Shoes", variable=self.edit_type_var, value=2)
+
+        self.edit_image_b = tk.Button(self.edit_window, text="Image", command=lambda: self.imageUpload())
 
         # Clean? checklist w/ Description frame
         self.edit_clean_var =  tk.IntVar()
@@ -318,7 +308,6 @@ class ClosetFrame(tk.Frame):
             
             self.edit_save = tk.Button(self.edit_window, text = "Save", command=lambda: self.saveCurrent())
 
-        
         self.edit_n_l.grid(row=0,column=0,sticky="NW")
         self.edit_n_en.grid(row=1,column=0,sticky="NW")
 
@@ -332,11 +321,21 @@ class ClosetFrame(tk.Frame):
         # save button
         self.edit_save.grid(row=5,column=0,sticky="NW")
 
+        # TYPE
+        self.edit_rb_t.grid(row=0,column=1,sticky="NW")
+        self.edit_rb_b.grid(row=1,column=1,sticky="NW")
+        self.edit_rb_s.grid(row=2,column=1,sticky="NW")
+        # edit image (under clothing type)
+        self.edit_image_b.grid(row=3,column=1,rowspan=1,sticky="NW")
+
     # SAVE CURRENT EDIT
     def saveCurrent(self):
         self.all_clothing[self.edit_select[0]].save(self.edit_n_var.get(), self.edit_d_txt.get("1.0",tk.END).replace('\n',' '), self.edit_clean_var.get())
         print(f"[SAVED] {self.all_clothing[self.edit_select[0]].get_info()}")
 
+        self.updateClothingList()
+
+    def updateClothingList(self):
         self.clothing_lb.delete(0,tk.END)  
         for i, clothing in enumerate(self.all_clothing):
             self.clothing_lb.insert(i, clothing.get_name())
@@ -459,6 +458,10 @@ class ClosetFrame(tk.Frame):
 
         # lb_preview
         self.prev_b.grid(row=0,column=0,sticky="NW")
+        
+        """
+        EDIT
+        """
         self.edit_current_b.grid(row=1,column=0,sticky="NW")
 
         """
@@ -486,7 +489,6 @@ class ClosetFrame(tk.Frame):
         
         self.closet_save_b.grid(row=6,column=0,sticky="NW")
 
-
     def example_data(self):
         shirt_1 = Top("Blue Shirt", "Blue shirt I bought at Wendy's")
         shirt_2 = Top("Black Shirt", "Black shirt I bought at McDonald's")
@@ -498,14 +500,7 @@ class ClosetFrame(tk.Frame):
 
         print("ADDING CLOTHING...")
 
-        for i, clothing in enumerate(self.all_clothing):
-            self.clothing_lb.insert(i, clothing.get_name())
-            print(f"[+] {clothing.get_name()}")
-
-            if clothing.is_clean():
-                self.clothing_lb.itemconfig(i,{'bg':'Green'})
-            else:
-                self.clothing_lb.itemconfig(i,{'bg':'Red'})
+        self.updateClothingList()
 
         print("FINISHED ADDING CLOTHING")
 
@@ -552,7 +547,6 @@ class MainApplication(tk.Frame):
     def showFrame(self, page_name):
         current_frame = self.all_frames[page_name]
         current_frame.tkraise()
-
     
 def main(): 
     agl13 = User("GH", "Andrew", "agl13")
@@ -562,7 +556,6 @@ def main():
     root = tk.Tk()
     MainApplication(root, agl13)
     root.mainloop()
-
 
 if __name__ == '__main__':
     main()

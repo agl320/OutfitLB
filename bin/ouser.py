@@ -82,22 +82,26 @@ class Closet():
 # Setters:
 # - Set image filepath
 class Clothing():
-    def __init__(self, name, desc="", colour="#ffffff", clean=1, filepath="image.jpg"):
+    def __init__(self, name, desc="", colour="#ffffff", clean=1, type="SHIRT", filepath="image.jpg"):
         self.name = name
         self.desc = desc
         self.colour = colour
         self.clean = clean
+        self.type = type.upper()
         self.filepath = filepath
 
     def get_name(self):
         return self.name
     
     def get_info(self):
-        info_str = f"Name: {self.name}\nDescription: {self.desc}"
+        info_str = f"Name: {self.name}\nDescription: {self.desc}\nType: {self.type}"
         return info_str
     
     def get_desc(self):
         return self.desc
+    
+    def get_type(self):
+        return self.type
     
     def is_clean(self):
         return self.clean 
@@ -119,7 +123,6 @@ class Clothing():
         self.set_name(new_name)
         self.set_desc(new_desc) 
         self.set_clean(new_clean)
-
     
     # sets image file path for clothing
     def set_image(self, filepath):
