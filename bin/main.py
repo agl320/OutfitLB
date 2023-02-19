@@ -55,11 +55,11 @@ class PreviewFrame(tk.Frame):
         self.image_current = ImageTk.PhotoImage(self.image_current)
 
         # default no image
-        self.prev_image = tk.Label(self, image=self.image_current)
+        self.prev_image = tk.Label(self.parent, image=self.image_current)
 
         # <> CLOTHING PANEL PREVIEW
         self.prev_label_var = tk.StringVar()
-        self.prev_label = tk.Label(self, textvariable=self.prev_label_var, font=("Helvetica", 10),justify= tk.LEFT) 
+        self.prev_label = tk.Label(self.parent, textvariable=self.prev_label_var, font=("Helvetica", 10),justify= tk.LEFT) 
         
         # <> PRINTING PREVIEW DATA
         self.getPreview()
@@ -85,8 +85,9 @@ class PreviewFrame(tk.Frame):
             print("[!] Selected")
             #strvar.set(clothing_lb.get(c_selection))
             self.prev_label_var.set(self.all_clothing[self.prev_select[0]].get_info())
-            self.prev_label.config(textvariable=self.prev_label_var)
+            self.prev_label = tk.Label(self.parent, textvariable=self.prev_label_var, font=("Helvetica", 10),justify= tk.LEFT) 
             # getting and displaying current clothing image
+
             self.filepath_current = self.all_clothing[self.prev_select[0]].get_image()
             if not self.filepath_current or self.filepath_current.isspace():
                 self.filepath_current = "image.jpg"
