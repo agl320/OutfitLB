@@ -163,9 +163,11 @@ class ClosetFrame(tk.Frame):
 
         # Add closet
         self.add_closet_b = tk.Button(self.navbar_frame, text="New closet", command=lambda: self.addCloset_expand())
+        self.add_closet_b.grid(row=0,column=1,sticky="NW")
 
         # Delete closet
         self.delete_closet_b = tk.Button(self.navbar_frame, text="Delete", command=lambda: self.deleteCloset())
+        self.delete_closet_b.grid(row=0,column=5,sticky="NW")
 
     def addCloset_expand(self):
         self.add_closet_b.destroy()
@@ -178,9 +180,12 @@ class ClosetFrame(tk.Frame):
         self.add_closet_id = tk.Entry(self.navbar_frame, textvariable=add_c_id, width=10)
         self.add_closet_b2 = tk.Button(self.navbar_frame, text="Add", command=lambda: self.addCloset())
 
+        self.back_closet_b = tk.Button(self.navbar_frame, text="Back", command=lambda: self.addCloset())
+
         self.add_closet_name.grid(row=0,column=1,sticky="NW")
         self.add_closet_id.grid(row=0,column=2,sticky="NW")
         self.add_closet_b2.grid(row=0,column=3,sticky="NW")
+        self.back_closet_b.grid(row=0,column=4,sticky="NW")
         
     
     def addCloset(self):
@@ -191,6 +196,7 @@ class ClosetFrame(tk.Frame):
         self.add_closet_name.destroy()
         self.add_closet_id.destroy()
         self.add_closet_b2.destroy()
+        self.back_closet_b.destroy()
 
         # Add closet
         self.add_closet_b = tk.Button(self.navbar_frame, text="New closet", command=lambda: self.addCloset_expand())
@@ -242,6 +248,8 @@ class ClosetFrame(tk.Frame):
             else:
                 self.clothing_lb.itemconfig(i,{'bg':'Red'})
 
+        
+
     def save_to_user(self):
         self.user.save_closet(self.all_clothing,self.dropdown.get().split()[1])
                 
@@ -262,9 +270,10 @@ class ClosetFrame(tk.Frame):
         # Edit name frame
         self.edit_n_l = tk.Label(self.edit_window, text="Name",justify= tk.LEFT)
 
+        # CREATE name var
         self.edit_n_var = tk.StringVar()
         self.edit_n_var.set("")
-        self.edit_n_en = tk.Entry(self.edit_window, textvariable=self.edit_n_var, width=40)
+        self.edit_n_en = tk.Entry(self.edit_window, textvariable=self.edit_n_var.get(), width=40)
 
         # Edit description frame
         self.edit_d_l = tk.Label(self.edit_window, text="Description",justify= tk.LEFT)
@@ -276,7 +285,7 @@ class ClosetFrame(tk.Frame):
 
         # Clean? checklist w/ Description frame
         self.edit_clean_var =  tk.IntVar()
-        self.edit_clean_b = tk.Checkbutton(self.edit_window, text = "Clean?", variable=self.edit_clean_var)
+        self.edit_clean_b = tk.Checkbutton(self.edit_window, text="Clean", variable=self.edit_clean_var)
 
         # gets selected item in listbox
         self.edit_select = self.clothing_lb.curselection()
@@ -287,9 +296,18 @@ class ClosetFrame(tk.Frame):
         else:
             print("[!] Selected")
             #strvar.set(clothing_lb.get(c_selection))
+
+            print(f"[DEBUG]: {self.all_clothing[self.edit_select[0]].get_name()}")
+            print(f"[DEBUG]: {self.all_clothing[self.edit_select[0]].get_desc()}")
+
             self.edit_n_var.set(self.all_clothing[self.edit_select[0]].get_name())
+            self.edit_n_en.config(textvariable = self.edit_n_var)
+            
             self.edit_d_var = self.all_clothing[self.edit_select[0]].get_desc()
             self.edit_d_txt.insert(tk.INSERT, self.edit_d_var)
+            
+            self.edit_clean_var.set(self.all_clothing[self.edit_select[0]].is_clean())
+
             # getting and displaying current clothing image
             #self.filepath_current = self.all_clothing[self.prev_select[0]].get_image()
             #if not self.filepath_current or self.filepath_current.isspace():
@@ -298,7 +316,9 @@ class ClosetFrame(tk.Frame):
 
             # SAVE BUTTON -> UPDATE ALL_CLOTHING
             
+            self.edit_save = tk.Button(self.edit_window, text = "Save", command=lambda: self.saveCurrent())
 
+        
         self.edit_n_l.grid(row=0,column=0,sticky="NW")
         self.edit_n_en.grid(row=1,column=0,sticky="NW")
 
@@ -309,7 +329,23 @@ class ClosetFrame(tk.Frame):
         # clean button
         self.edit_clean_b.grid(row=4,column=0,rowspan=1,sticky="NW")
 
+        # save button
+        self.edit_save.grid(row=5,column=0,sticky="NW")
 
+    # SAVE CURRENT EDIT
+    def saveCurrent(self):
+        self.all_clothing[self.edit_select[0]].save(self.edit_n_var.get(), self.edit_d_txt.get("1.0",tk.END).replace('\n',' '), self.edit_clean_var.get())
+        print(f"[SAVED] {self.all_clothing[self.edit_select[0]].get_info()}")
+
+        self.clothing_lb.delete(0,tk.END)  
+        for i, clothing in enumerate(self.all_clothing):
+            self.clothing_lb.insert(i, clothing.get_name())
+            print(f"[+] {clothing.get_name()}")
+
+            if clothing.is_clean():
+                self.clothing_lb.itemconfig(i,{'bg':'Green'})
+            else:
+                self.clothing_lb.itemconfig(i,{'bg':'Red'})
 
     def addInfo(self):
         # Name frame
@@ -416,8 +452,6 @@ class ClosetFrame(tk.Frame):
         """
         # ALL CLOTHING FRAME
         self.dropdown.grid(row=0,column=0,sticky="NW")
-        self.add_closet_b.grid(row=0,column=1,sticky="NW")
-        self.delete_closet_b.grid(row=0,column=4,sticky="NW")
 
         # lb_frame
         self.clothing_lb.grid(row=0,column=0,columnspan=3,sticky="NW")

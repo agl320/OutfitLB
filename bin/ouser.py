@@ -87,10 +87,17 @@ class Clothing():
         self.desc = desc
         self.colour = colour
         self.clean = clean
-        self.filepath=filepath
+        self.filepath = filepath
 
     def get_name(self):
         return self.name
+    
+    def get_info(self):
+        info_str = f"Name: {self.name}\nDescription: {self.desc}"
+        return info_str
+    
+    def get_desc(self):
+        return self.desc
     
     def is_clean(self):
         return self.clean 
@@ -99,12 +106,20 @@ class Clothing():
         print(f"Name: {self.name}")
         print(f"Description: {self.desc}")
 
-    def get_info(self):
-        info_str = f"Name: {self.name}\nDescription: {self.desc}"
-        return info_str
+    def set_name(self, new_name):
+        self.name = new_name
+
+    def set_desc(self, new_desc):
+        self.desc = new_desc 
     
-    def get_desc(self):
-        return self.desc
+    def set_clean(self, new_clean):
+        self.clean = new_clean
+
+    def save(self, new_name, new_desc, new_clean):
+        self.set_name(new_name)
+        self.set_desc(new_desc) 
+        self.set_clean(new_clean)
+
     
     # sets image file path for clothing
     def set_image(self, filepath):
