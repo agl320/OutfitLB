@@ -76,16 +76,21 @@ class PreviewFrame(tk.Frame):
         print(f"Index: {self.prev_select[0]}")
         print(self.all_clothing[self.prev_select[0]].print_info())
         # check if no listbox item selected
+        
         if not self.prev_select:
             print("[!] None selected.")
             self.prev_label_var.set("None selected.")
-            self.prev_label = tk.Label(self.parent, textvariable=self.prev_label_var, font=("Helvetica", 10),justify= tk.LEFT) 
+            self.prev_label.config(textvariable=self.prev_label_var)
+
+            #self.prev_label = tk.Label(self.parent, textvariable=self.prev_label_var, font=("Helvetica", 10),justify= tk.LEFT) 
             self.prev_image = tk.Label(self.parent, text="No image.")
+
         else:
             print("[!] Selected")
             #strvar.set(clothing_lb.get(c_selection))
             self.prev_label_var.set(self.all_clothing[self.prev_select[0]].get_info())
-            self.prev_label = tk.Label(self.parent, textvariable=self.prev_label_var, font=("Helvetica", 10),justify= tk.LEFT) 
+            self.prev_label.config(textvariable=self.prev_label_var)
+            #self.prev_label = tk.Label(self.parent, textvariable=self.prev_label_var, font=("Helvetica", 10),justify= tk.LEFT) 
             # getting and displaying current clothing image
 
             self.filepath_current = self.all_clothing[self.prev_select[0]].get_image()
@@ -95,6 +100,7 @@ class PreviewFrame(tk.Frame):
 
             self.image_current = Image.open(self.filepath_current).resize((100, 100))
             self.image_current = ImageTk.PhotoImage(self.image_current)
+
             self.prev_image.configure(image=self.image_current)
             # prevent garbage collection
             self.prev_image.image = self.image_current
@@ -130,7 +136,7 @@ class ClosetFrame(tk.Frame):
         self.sb['command'] = self.clothing_lb.yview
         
         # <> PREVIEW BUTTON
-        self.prev_b = tk.Button(self.lb_button_frame, text='Preview', command=self.callPreview)
+        self.prev_b = tk.Button(self.lb_button_frame, text='Preview', command=lambda: self.callPreview())
         self.edit_current_b = tk.Button(self.lb_button_frame, text="Edit", command=lambda: self.editCurrent())
         
         # + EXAMPLE DATA
@@ -242,8 +248,10 @@ class ClosetFrame(tk.Frame):
         Creates a preview frame and changes the contents of such preview frame.
         Then places the preview frame using grid. 
         """
+        
         self.previewframe = PreviewFrame(self.lb_preview, self.all_clothing, self.clothing_lb) # maybe self.lb_preview?
         self.previewframe.grid(row=0,column=2,sticky="NW")
+
     
     def editCurrent(self):
         self.edit_window = tk.Toplevel(self.lb_preview)
