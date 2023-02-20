@@ -55,11 +55,11 @@ class PreviewFrame(tk.Frame):
         self.image_current = ImageTk.PhotoImage(self.image_current)
 
         # default no image
-        self.prev_image = tk.Label(self.parent, image=self.image_current)
+        self.prev_image = tk.Label(self, image=self.image_current)
 
         # <> CLOTHING PANEL PREVIEW
         self.prev_label_var = tk.StringVar()
-        self.prev_label = tk.Label(self.parent, textvariable=self.prev_label_var, font=("Helvetica", 10),justify= tk.LEFT) 
+        self.prev_label = tk.Label(self, textvariable=self.prev_label_var, font=("Helvetica", 10),justify= tk.LEFT) 
         
         # <> PRINTING PREVIEW DATA
         self.getPreview()
@@ -67,8 +67,8 @@ class PreviewFrame(tk.Frame):
         # <> WIDGET DISPLAY
         self.widgetDisplay()
 
+
     def getPreview(self):
-        
         # gets selected item in listbox
         self.prev_select = self.clothing_lb.curselection()
         # gets value of selected
@@ -83,7 +83,7 @@ class PreviewFrame(tk.Frame):
             self.prev_label.config(textvariable=self.prev_label_var)
 
             #self.prev_label = tk.Label(self.parent, textvariable=self.prev_label_var, font=("Helvetica", 10),justify= tk.LEFT) 
-            self.prev_image = tk.Label(self.parent, text="No image.")
+            self.prev_image = tk.Label(self, text="No image.")
 
         else:
             print("[!] Selected")
@@ -248,7 +248,6 @@ class ClosetFrame(tk.Frame):
         Creates a preview frame and changes the contents of such preview frame.
         Then places the preview frame using grid. 
         """
-        
         self.previewframe = PreviewFrame(self.lb_preview, self.all_clothing, self.clothing_lb) # maybe self.lb_preview?
         self.previewframe.grid(row=0,column=2,sticky="NW")
 
