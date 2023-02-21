@@ -251,7 +251,6 @@ class ClosetFrame(tk.Frame):
         self.previewframe = PreviewFrame(self.lb_preview, self.all_clothing, self.clothing_lb) # maybe self.lb_preview?
         self.previewframe.grid(row=0,column=2,sticky="NW")
 
-    
     def editCurrent(self):
         self.edit_window = tk.Toplevel(self.lb_preview)
         # grab_set() to isolate actions to window
