@@ -373,7 +373,7 @@ class ClosetFrame(tk.Frame):
         self.add_image_b = tk.Button(self.type_frame, text="Image", command=lambda: self.imageUpload())
 
         # SAVE 
-        self.closet_save_b = tk.Button(self.type_frame, text='Save closet', command=lambda: self.save_to_user())
+        #self.closet_save_b = tk.Button(self.type_frame, text='Save closet', command=lambda: self.save_to_user())
             
     def imageUpload(self):
         # clear current filepath
@@ -421,6 +421,9 @@ class ClosetFrame(tk.Frame):
             else:
                 self.clothing_lb.insert(tk.END, self.add_n_var)
                 self.clothing_lb.itemconfig(tk.END,{'bg':'Red'})
+
+            self.save_to_user()
+
         except:
             tk.messagebox.showwarning(title="Closet error", message="Closet does not exist!")
             print("[!] Closet does not exist")
@@ -483,7 +486,7 @@ class ClosetFrame(tk.Frame):
         # add image (under clothing type)
         self.add_image_b.grid(row=3,column=0,rowspan=1,sticky="NW")
         
-        self.closet_save_b.grid(row=6,column=0,sticky="NW")
+        #self.closet_save_b.grid(row=6,column=0,sticky="NW")
 
         """
         PREVIEW
@@ -506,6 +509,8 @@ class ClosetFrame(tk.Frame):
         self.updateClothingList()
 
         print("FINISHED ADDING CLOTHING")
+
+        self.save_to_user()
 
 class MainApplication(tk.Frame):
     def __init__(self, parent, user, *args, **kwargs):
