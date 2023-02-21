@@ -82,13 +82,17 @@ class Closet():
 # Setters:
 # - Set image filepath
 class Clothing():
-    def __init__(self, name, desc="", colour="#ffffff", clean=1, type="SHIRT", filepath="image.jpg"):
+    def __init__(self, name, desc="", colour="#ffffff", type=0, filepath="image.jpg", clean=False):
         self.name = name
         self.desc = desc
         self.colour = colour
         self.clean = clean
-        self.type = type.upper()
+        self.type = type
         self.filepath = filepath
+
+    """
+    GETTERS
+    """
 
     def get_name(self):
         return self.name
@@ -102,6 +106,9 @@ class Clothing():
     
     def get_type(self):
         return self.type
+
+    def get_image(self):
+        return self.filepath
     
     def is_clean(self):
         return self.clean 
@@ -109,6 +116,10 @@ class Clothing():
     def print_info(self):
         print(f"Name: {self.name}")
         print(f"Description: {self.desc}")
+
+    """
+    SETTERS
+    """
 
     def set_name(self, new_name):
         self.name = new_name
@@ -119,30 +130,32 @@ class Clothing():
     def set_clean(self, new_clean):
         self.clean = new_clean
 
-    def save(self, new_name, new_desc, new_clean):
-        self.set_name(new_name)
-        self.set_desc(new_desc) 
-        self.set_clean(new_clean)
+    def set_type(self, new_type):
+        self.type = new_type
+
+    def save(self, name, desc, clean, type):
+        self.set_name(name)
+        self.set_desc(desc) 
+        self.set_clean(clean)
+        self.set_type(type)
     
     # sets image file path for clothing
     def set_image(self, filepath):
         self.filepath = filepath
     
-    def get_image(self):
-        return self.filepath
 
     def __repr__(self):
         return f"{self.name} of type {self.__class__.__name__}"
 
 class Top(Clothing):
-    def __init__(self, name, desc="", colour="#ffffff", sleeves=True, clean=1, filepath=""):
-        super().__init__(name, desc, colour, clean, filepath)
+    def __init__(self, name, desc="", colour="#ffffff", type=0, sleeves=True, filepath="image.jpg", clean=False):
+        super().__init__(name, desc, colour, type, filepath, clean)
         self.sleeves = sleeves
 
 class Bottom(Clothing):
-    def __init__(self, name, desc="", colour="#ffffff", clean=1, filepath=""):
-        super().__init__(name, desc, colour, clean, filepath)
+    def __init__(self, name, desc="", colour="#ffffff", type=1, filepath="image.jpg", clean=False):
+        super().__init__(name, desc, colour, type, filepath, clean)
 
 class Shoes(Clothing):
-    def __init__(self, name, desc="", colour="#ffffff", clean=1, filepath=""):
-        super().__init__(name, desc, colour, clean, filepath)
+    def __init__(self, name, desc="", colour="#ffffff", type=2, filepath="image.jpg", clean=False):
+        super().__init__(name, desc, colour, type, filepath, clean)
