@@ -82,13 +82,14 @@ class Closet():
 # Setters:
 # - Set image filepath
 class Clothing():
-    def __init__(self, name, desc="", colour="#ffffff", type=0, filepath="image.jpg", clean=False):
+    def __init__(self, name, desc="", colour="#ffffff", type=0, filepath="image.jpg", clean=False, ckmean=None):
         self.name = name
         self.desc = desc
         self.colour = colour
         self.clean = clean
         self.type = type
         self.filepath = filepath
+        self.ckmean = ckmean # pyplot figure
 
     """
     GETTERS
@@ -109,6 +110,9 @@ class Clothing():
 
     def get_image(self):
         return self.filepath
+    
+    def get_ckmean(self):
+        return self.ckmean
     
     def is_clean(self):
         return self.clean 
@@ -132,6 +136,9 @@ class Clothing():
 
     def set_type(self, new_type):
         self.type = new_type
+
+    def set_ckmean(self, new_ckmean):
+        self.ckmean = new_ckmean
 
     def save(self, name, desc, clean, type):
         self.set_name(name)

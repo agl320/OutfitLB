@@ -2,11 +2,16 @@
 # removing use of global variables
 
 import tkinter as tk
+import matplotlib.pyplot as plt
 from tkinter import filedialog, ttk
 from PIL import Image, ImageTk
+# No need for NavigationToolbar2Tk since colour plot for now; no need for zoom
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg 
+
 
 # removal of prefix
 from ouser import *
+from ckmean import *
 """
 class ClosetPopUp(tk.Frame):
     def __init__(self, parent):
@@ -101,7 +106,48 @@ class ClosetFrame(tk.Frame):
         # <> CLOTHING PANEL PREVIEW
         self.prev_label_var = tk.StringVar()
         self.prev_label = tk.Label(self.lb_preview, textvariable=self.prev_label_var, font=("Helvetica", 10),justify= tk.LEFT) 
-        
+
+    def ckmeanDisplay(self, fig):
+        canvas = FigureCanvasTkAgg(fig, master = self.lb_preview) 
+        canvas.get_tk_widget().grid(row=3,column=4,sticky="NW")
+
+    def ckmeanGenerate(self, imagepath):
+
+        # Reading image into array
+        img=cv2.imread(imagepath)
+        # Conversion from BGR to RGB
+        img=cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+        # Reshaping into flat array [R G B] of MxN size
+        img=img.reshape((img.shape[1]*img.shape[0],3))
+
+        # Kmeans algorithm
+        kmeans=KMeans(n_clusters=4)
+        s=kmeans.fit(img)
+
+        # Each point assigned a label (cluster)
+        labels=kmeans.labels_
+        labels=list(labels)
+
+        # Average position
+        centroid=kmeans.cluster_centers_
+
+        # For each centroid size, take proportion 
+        percent=[]
+        for i in range(len(centroid)):
+            # Number of points within pertaining to a cluster
+            j=labels.count(i)
+            # Dividing by total number of points
+            j=j/(len(labels))
+            # Average out of 100
+            percent.append(j)
+
+        fig = plt.Figure(figsize=(2, 2), dpi=50)
+        ax = fig.add_subplot(111)
+        ax.pie(percent,colors=np.array(centroid/255),labels=np.arange(len(centroid)))
+        self.ckmeanDisplay(fig)
+
+        self.all_clothing[self.prev_select[0]].set_ckmean(fig)
+
     def getPreview(self):
         # gets selected item in listbox
         self.prev_select = self.clothing_lb.curselection()
@@ -139,7 +185,18 @@ class ClosetFrame(tk.Frame):
             # prevent garbage collection
             self.prev_image.image = self.image_current
 
+            # DISPLAY CKMEAN
+            if self.all_clothing[self.prev_select[0]].get_ckmean() == None:
+                print("[!] NO PIE CHART")
 
+                self.ckmeanGenerate(self.filepath_current)
+                
+                #plt.savefig('clothing_pie', bbox_inches='tight')
+
+            else:
+                self.ckmeanDisplay(self.all_clothing[self.prev_select[0]].get_ckmean())
+
+    
     def navBar(self):
         # <> CLOSET DISPLAY
         # Dropdown menu
