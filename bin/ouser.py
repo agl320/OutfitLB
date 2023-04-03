@@ -4,6 +4,10 @@ class User():
         self.lastName = lastName 
         self.userName = userName 
         self.closet_lst = {}
+        self.outfit_lst = []
+
+    def new_outfit(self, name, top, bottom, shoes):
+        self.outfit_lst.append(Outfit(name,top,bottom,shoes))
 
     def new_closet(self, name, ID, desc=""):
         self.closet_lst[ID]=Closet(name, desc)
@@ -44,6 +48,13 @@ class User():
     def save_closet(self,closet_new,ID):
         self.closet_lst[ID].set_closet(closet_new)
         print(f"UPDATED CLOSET [{ID}]: {self.closet_lst}")
+
+class Outfit():
+    def __init__(self, name, top, bottom, shoes):
+        self.name = name
+        self.top = top
+        self.bottom = bottom
+        self.shoes = shoes 
         
 # Closet class
 # - Closet contains dict of Clothing (Top, Bottom, Shoes)

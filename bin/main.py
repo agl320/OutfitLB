@@ -12,6 +12,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # removal of prefix
 from ouser import *
 from ckmean import *
+from outfit import *
+
 """
 class ClosetPopUp(tk.Frame):
     def __init__(self, parent):
@@ -43,8 +45,37 @@ class OutfitFrame(tk.Frame):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
 
-        self.test = tk.Label(self, text="HELLO")
+        self.o_lb_frame = tk.Frame(self)
+        self.o_option_fr = tk.Frame(self)
+
+        # Scrollbar and Listbox
+        self.sb = tk.Scrollbar(self.o_lb_frame, orient=tk.VERTICAL) 
+        # display current list box of closet
+        self.outfit_lb = tk.Listbox(self.o_lb_frame, yscrollcommand = self.sb.set, height = 10, width = 30,activestyle = 'dotbox',font = ("Helvetica",10),fg = "white")
+        self.sb['command'] = self.outfit_lb.yview
+
+        self.addOutfit_b = tk.Button(self.o_option_fr, text='New', command=lambda: self.addOutfit())
+        self.editOutfit_b = tk.Button(self.o_option_fr, text='Edit', command=lambda: self.addOutfit())
+        self.delOutfit_b = tk.Button(self.o_option_fr, text='Delete', command=lambda: self.addOutfit())
+
+        self.test = tk.Label(self, text="Outfits")
         self.test.grid(row=0,column=0)
+
+        # lb_frame
+        self.outfit_lb.grid(row=0,column=0,sticky="NW")
+        self.o_lb_frame.grid(row=1,column=0,sticky="NW")
+
+        self.addOutfit_b.grid(row=0,column=0,sticky="NW")
+        self.editOutfit_b.grid(row=0,column=1,sticky="NW")
+        self.delOutfit_b.grid(row=0,column=2,sticky="NW")
+
+        self.o_option_fr.grid(row=2,column=0,sticky="NW")
+
+    def addOutfit(self):
+        self.edit_window = tk.Toplevel(self)
+        # grab_set() to isolate actions to window
+        self.edit_window.grab_set()
+
 
 class ClosetFrame(tk.Frame):
     def __init__(self, parent, user, *args, **kwargs):
@@ -500,7 +531,7 @@ class ClosetFrame(tk.Frame):
         #addClothing_en.grid(row=1,column=1,rowspan=1,sticky="N")
         # name 
         self.addframe.grid(row=2,column=0,rowspan=6,columnspan=6,sticky="NW")
-        self.lb_preview.grid(row=1,column=3,sticky="NW")
+        self.lb_preview.grid(row=1,column=3,rowspan=3,sticky="NW")
 
         """
         LISTBOX FRAME
