@@ -12,7 +12,6 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # removal of prefix
 from ouser import *
 from ckmean import *
-from outfit import *
 
 """
 class ClosetPopUp(tk.Frame):
@@ -90,7 +89,7 @@ class ClosetFrame(tk.Frame):
         # <> LEFT LIST AND RIGHT PREVIEW
         self.lb_frame = tk.Frame(self)
         self.lb_preview = tk.Frame(self)
-        self.addframe = tk.Frame(self)
+        
 
         self.lb_button_frame = tk.Frame(self.lb_preview)
 
@@ -104,24 +103,19 @@ class ClosetFrame(tk.Frame):
         self.sb['command'] = self.clothing_lb.yview
         
         # <> PREVIEW BUTTON
-        self.prev_b = tk.Button(self.lb_button_frame, text='Preview', command=lambda: self.getPreview())
-        self.edit_current_b = tk.Button(self.lb_button_frame, text="Edit", command=lambda: self.editCurrent())
+        self.prev_b = tk.Button(self.lb_frame, text='Preview', command=lambda: self.getPreview())
+        self.edit_current_b = tk.Button(self.lb_frame, text="Edit", command=lambda: self.editCurrent())
         
         # + EXAMPLE DATA
         self.all_clothing = self.user.get_closet('0').get_all()
         self.example_data()
 
-        # <> ADD SECTION
-         # Left type + image frame
-        # Right info frame
-        self.type_frame = tk.Frame(self.addframe)
-        self.info_frame = tk.Frame(self.addframe)
-
+        
         # init no image filepath
         self.filepath_add=""
 
-        self.addType()
-        self.addInfo()
+        # + ADD DATA
+        self.add_b = tk.Button(self.lb_frame, text='Add clothing', command=lambda: self.addNewPopup())
 
         # <> WIDGET DISPLAY
         self.widgetDisplay()
@@ -237,40 +231,62 @@ class ClosetFrame(tk.Frame):
         self.dropdown.bind("<<ComboboxSelected>>", self.dropdown_callback)
 
         # Add closet
-        self.add_closet_b = tk.Button(self.navbar_frame, text="New closet", command=lambda: self.addCloset_expand())
+        self.add_closet_b = tk.Button(self.navbar_frame, text="New closet", command=lambda: self.addClosetPopup())
         self.add_closet_b.grid(row=0,column=1,sticky="NW")
 
         # Delete closet
         self.delete_closet_b = tk.Button(self.navbar_frame, text="Delete", command=lambda: self.deleteCloset())
         self.delete_closet_b.grid(row=0,column=5,sticky="NW")
 
-    def addCloset_expand(self):
-        self.add_closet_b.destroy()
+    def addClosetPopup(self):
+        self.add_closet_window = tk.Toplevel(self)
+        self.add_closet_window.geometry("200x200")
+        # grab_set() to isolate actions to window
+        self.add_closet_window.grab_set()
 
         add_c_name = tk.StringVar()
         add_c_name.set("Closet-Name")
         add_c_id = tk.IntVar()
         add_c_id.set("ID")
-        self.add_closet_name = tk.Entry(self.navbar_frame, textvariable=add_c_name, width=20)
-        self.add_closet_id = tk.Entry(self.navbar_frame, textvariable=add_c_id, width=10)
-        self.add_closet_b2 = tk.Button(self.navbar_frame, text="Add", command=lambda: self.addCloset())
+        self.add_closet_name = tk.Entry(self.add_closet_window, textvariable=add_c_name, width=20)
+        self.add_closet_id = tk.Entry(self.add_closet_window, textvariable=add_c_id, width=10)
+        self.add_closet_b2 = tk.Button(self.add_closet_window, text="Add", command=lambda: self.addCloset())
 
-        self.back_closet_b = tk.Button(self.navbar_frame, text="Back", command=lambda: self.addCloset())
+        self.back_closet_b = tk.Button(self.add_closet_window, text="Cancel", command=self.add_closet_window.destroy)
 
-        self.add_closet_name.grid(row=0,column=1,sticky="NW")
-        self.add_closet_id.grid(row=0,column=2,sticky="NW")
-        self.add_closet_b2.grid(row=0,column=3,sticky="NW")
-        self.back_closet_b.grid(row=0,column=4,sticky="NW")
+        self.add_closet_name.grid(row=0,column=0,columnspan = 2,sticky="NW")
+        self.add_closet_id.grid(row=1,column=0,columnspan = 2,sticky="NW")
+        self.add_closet_b2.grid(row=2,column=0,sticky="NW")
+        self.back_closet_b.grid(row=2,column=1,sticky="NW")
+
+    # def addCloset_expand(self):
+    #     self.addClosetPopup()
+    #     self.add_closet_b.destroy()
+
+    #     add_c_name = tk.StringVar()
+    #     add_c_name.set("Closet-Name")
+    #     add_c_id = tk.IntVar()
+    #     add_c_id.set("ID")
+    #     self.add_closet_name = tk.Entry(self.navbar_frame, textvariable=add_c_name, width=20)
+    #     self.add_closet_id = tk.Entry(self.navbar_frame, textvariable=add_c_id, width=10)
+    #     self.add_closet_b2 = tk.Button(self.navbar_frame, text="Add", command=lambda: self.addCloset())
+
+    #     self.back_closet_b = tk.Button(self.navbar_frame, text="Back", command=lambda: self.addCloset())
+
+    #     self.add_closet_name.grid(row=0,column=1,sticky="NW")
+    #     self.add_closet_id.grid(row=0,column=2,sticky="NW")
+    #     self.add_closet_b2.grid(row=0,column=3,sticky="NW")
+    #     self.back_closet_b.grid(row=0,column=4,sticky="NW")
         
     def addCloset(self):
         print(f"[+] Added new closet: {self.add_closet_name.get()}, {self.add_closet_id.get()}")
         self.user.new_closet(self.add_closet_name.get().replace(' ','-'),self.add_closet_id.get().replace(' ','-'))
 
-        # DELETE AND REVERT TO INITIAL NAVBAR
-        self.add_closet_name.destroy()
-        self.add_closet_id.destroy()
-        self.add_closet_b2.destroy()
-        self.back_closet_b.destroy()
+        # # DELETE AND REVERT TO INITIAL NAVBAR
+        # self.add_closet_name.destroy()
+        # self.add_closet_id.destroy()
+        # self.add_closet_b2.destroy()
+        # self.back_closet_b.destroy()
 
         # Add closet
         self.add_closet_b = tk.Button(self.navbar_frame, text="New closet", command=lambda: self.addCloset_expand())
@@ -282,6 +298,8 @@ class ClosetFrame(tk.Frame):
         print(f"[=] All closet name: {self.user.get_all_closet_name()}")
         print(f"[=] All closet id: {self.user.get_all_closet_id()}")
         #print(f"First closet: {self.user.get_closet('0')}")
+
+        self.add_closet_window.destroy()
 
     def deleteCloset(self):
         self.mb_confirm = tk.messagebox.askyesno(title="Delete confirmation", message=f"Are you sure you want to delete closet: {self.dropdown.get()}")
@@ -430,6 +448,50 @@ class ClosetFrame(tk.Frame):
             else:
                 self.clothing_lb.itemconfig(i,{'bg':'Red'})
 
+    def addNewPopup(self):
+        self.add_window = tk.Toplevel(self)
+        # self.add_window.geometry("200x200")
+        # grab_set() to isolate actions to window
+        self.add_window.grab_set()
+
+        self.addframe = tk.Frame(self)
+        self.addframe.grid(row=2,column=0,rowspan=6,columnspan=6,sticky="NW")
+
+        """
+        INFO ADD FRAME 
+        """
+        # <> ADD SECTION
+         # Left type + image frame
+        # Right info frame
+        self.type_frame = tk.Frame(self.addframe)
+        self.info_frame = tk.Frame(self.addframe)
+        self.addType()
+        self.addInfo()
+        self.type_frame.grid(row=2, column=0,sticky="NW")
+        self.info_frame.grid(row=2, column=2,sticky="NW")
+        self.add_n_l.grid(row=0,column=0,sticky="NW")
+        self.add_n_en.grid(row=1,column=0,sticky="NW")
+
+        # description
+        self.add_d_l.grid(row=2,column=0,sticky="NW")
+        self.add_d_txt.grid(row=3,column=0,rowspan=1,sticky="NW")
+        self.add_clean_b.grid(row=4,column=0,rowspan=1,sticky="NW")
+
+         # button submit
+        self.add_sm_b.grid(row=5,column=0, sticky="NW")
+        
+        """
+        TYPE FRAME 
+        """
+        self.add_rb_t.grid(row=0,column=0,sticky="NW")
+        self.add_rb_b.grid(row=1,column=0,sticky="NW")
+        self.add_rb_s.grid(row=2,column=0,sticky="NW")
+        # add image (under clothing type)
+        self.add_image_b.grid(row=3,column=0,rowspan=1,sticky="NW")
+        
+        #self.closet_save_b.grid(row=6,column=0,sticky="NW")
+
+
     def addInfo(self):
         # Name frame
         self.add_n_l = tk.Label(self.info_frame, text="Name",justify= tk.LEFT)
@@ -524,14 +586,12 @@ class ClosetFrame(tk.Frame):
         """
         self.navbar_frame.grid(row=0,column=0,columnspan=6,sticky="NW")
         self.lb_frame.grid(row=1,column=0,columnspan=3,sticky="NW")
-        self.type_frame.grid(row=2, column=0,sticky="NW")
-        self.info_frame.grid(row=2, column=2,sticky="NW")
 
         self.lb_button_frame.grid(row=0,column=0,sticky="NW")
         #addClothing_en.grid(row=1,column=1,rowspan=1,sticky="N")
         # name 
-        self.addframe.grid(row=2,column=0,rowspan=6,columnspan=6,sticky="NW")
         self.lb_preview.grid(row=1,column=3,rowspan=3,sticky="NW")
+        
 
         """
         LISTBOX FRAME
@@ -544,37 +604,17 @@ class ClosetFrame(tk.Frame):
         self.sb.grid(row=0,column=2, sticky='NSE')
 
         # lb_preview
-        self.prev_b.grid(row=0,column=0,sticky="NW")
+        self.prev_b.grid(row=4,column=2,sticky="NW")
         
         """
         EDIT
         """
-        self.edit_current_b.grid(row=1,column=0,sticky="NW")
+        self.edit_current_b.grid(row=4,column=1,sticky="NW")
 
         """
-        INFO ADD FRAME 
+        ADD
         """
-        self.add_n_l.grid(row=0,column=0,sticky="NW")
-        self.add_n_en.grid(row=1,column=0,sticky="NW")
-
-        # description
-        self.add_d_l.grid(row=2,column=0,sticky="NW")
-        self.add_d_txt.grid(row=3,column=0,rowspan=1,sticky="NW")
-        self.add_clean_b.grid(row=4,column=0,rowspan=1,sticky="NW")
-
-         # button submit
-        self.add_sm_b.grid(row=5,column=0, sticky="NW")
-        
-        """
-        TYPE FRAME 
-        """
-        self.add_rb_t.grid(row=0,column=0,sticky="NW")
-        self.add_rb_b.grid(row=1,column=0,sticky="NW")
-        self.add_rb_s.grid(row=2,column=0,sticky="NW")
-        # add image (under clothing type)
-        self.add_image_b.grid(row=3,column=0,rowspan=1,sticky="NW")
-        
-        #self.closet_save_b.grid(row=6,column=0,sticky="NW")
+        self.add_b.grid(row=4,column=0,sticky="NW")
 
         """
         PREVIEW
