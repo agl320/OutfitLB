@@ -17,6 +17,9 @@ class User():
 
     def get_closet(self, ID):
         return self.closet_lst[ID]
+    
+    def get_outfits(self):
+        return self.outfit_lst
 
     # returns dict of all closets
     def get_all(self):
@@ -55,6 +58,9 @@ class Outfit():
         self.top = top
         self.bottom = bottom
         self.shoes = shoes 
+    
+    def get_name(self):
+        return self.name
         
 # Closet class
 # - Closet contains dict of Clothing (Top, Bottom, Shoes)
