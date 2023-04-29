@@ -51,6 +51,7 @@ class OutfitFrame(tk.Frame):
 
         self.o_lb_frame = tk.Frame(self)
         self.o_option_fr = tk.Frame(self)
+        self.o_view_fr = tk.Frame(self)
 
         # Scrollbar and Listbox
         self.sb = tk.Scrollbar(self.o_lb_frame, orient=tk.VERTICAL) 
@@ -60,18 +61,20 @@ class OutfitFrame(tk.Frame):
 
         self.addOutfit_b = tk.Button(self.o_option_fr, text='New', command=lambda: self.addOutfitPopup())
         self.editOutfit_b = tk.Button(self.o_option_fr, text='Edit', command=lambda: self.addOutfitPopup())
+        self.viewOutfit_b = tk.Button(self.o_option_fr, text='View', command=lambda: self.viewOutfit())
         self.delOutfit_b = tk.Button(self.o_option_fr, text='Delete', command=lambda: self.addOutfitPopup())
 
-        self.test = tk.Label(self, text="Outfits")
-        self.test.grid(row=0,column=0)
-
+        # LB FRAME
+        self.o_lb_frame.grid(row=0,column=0,sticky="NW")
+        
         # lb_frame
         self.outfit_lb.grid(row=0,column=0,sticky="NW")
-        self.o_lb_frame.grid(row=1,column=0,sticky="NW")
+        self.o_view_fr.grid(row=0,column=1,sticky="NW")
 
         self.addOutfit_b.grid(row=0,column=0,sticky="NW")
         self.editOutfit_b.grid(row=0,column=1,sticky="NW")
-        self.delOutfit_b.grid(row=0,column=2,sticky="NW")
+        self.viewOutfit_b.grid(row=0,column=2,sticky="NW")
+        self.delOutfit_b.grid(row=0,column=3,sticky="NW")
 
         self.o_option_fr.grid(row=2,column=0,sticky="NW")
 
@@ -101,6 +104,22 @@ class OutfitFrame(tk.Frame):
                 print("WARNING: Clothing of unknown type!")
         
         print(f"NET CLOTHING: {self.net_clothing}")
+
+    def viewOutfit(self):
+        self.o_view_name_var = tk.StringVar()
+        self.o_view_name = tk.Label(self.o_view_fr, textvariable=self.o_view_name_var)
+
+        if self.outfit_lb.curselection():
+            self.o_view_name_var.set(self.outfit_lb.get(self.outfit_lb.curselection()))
+            self.o_view_name.config(textvariable=self.o_view_name_var)
+
+            self.o_view_name.grid(row=0,column=0,sticky="NW")
+
+            print("! Outfit selected")
+            print(f"\t{self.o_view_name_var}")
+        else:
+            print("! No outfit selected")
+
 
     def addOutfitPopup(self):
         self.add_outfit_window = tk.Toplevel(self)
@@ -197,7 +216,6 @@ class OutfitFrame(tk.Frame):
         print(f"[+ outfit name:{outfit.get_name()}]")
 
 
-
 class ClosetFrame(tk.Frame):
     def __init__(self, parent, user, *args, **kwargs):
         # not using super because tkinter uses old way
@@ -225,7 +243,7 @@ class ClosetFrame(tk.Frame):
         self.sb['command'] = self.clothing_lb.yview
         
         # <> PREVIEW BUTTON
-        self.prev_b = tk.Button(self.lb_frame, text='Preview', command=lambda: self.getPreview())
+        self.prev_b = tk.Button(self.lb_frame, text='View', command=lambda: self.getPreview())
         self.edit_current_b = tk.Button(self.lb_frame, text="Edit", command=lambda: self.editCurrent())
         self.del_current_b = tk.Button(self.lb_frame, text='Delete', command=lambda: self.delCurrent())
         
@@ -425,7 +443,7 @@ class ClosetFrame(tk.Frame):
         self.add_closet_window.destroy()
 
     def deleteCloset(self):
-        self.mb_confirm = tk.messagebox.askyesno(title="Delete confirmation", message=f"Are you sure you want to delete closet: {self.dropdown.get()}")
+        self.mb_confirm = tk.messagebox.askyesno(title="Confirm Delete", message=f"Are you sure you want to delete closet: {self.dropdown.get()}")
         
         if self.mb_confirm:
             print(f"[X] Deleted closet: {self.dropdown.get().split()[1]}")
@@ -463,7 +481,7 @@ class ClosetFrame(tk.Frame):
         #self.previewframe.grid(row=0,column=2,sticky="NW")
 
     def delCurrent(self):
-        confirm = tk.messagebox.askyesno("Confirm Quit", "Are you sure you want to quit?")
+        confirm = tk.messagebox.askyesno("Confirm Delete", message=f"Are you sure you want to clothing {self.clothing_lb.curselection()}?")
 
         print(f"BEFORE DELETE: {self.all_clothing}")
         if confirm:
