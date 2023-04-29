@@ -60,7 +60,7 @@ class OutfitFrame(tk.Frame):
         self.sb['command'] = self.outfit_lb.yview
 
         self.addOutfit_b = tk.Button(self.o_option_fr, text='New', command=lambda: self.addOutfitPopup())
-        self.editOutfit_b = tk.Button(self.o_option_fr, text='Edit', command=lambda: self.addOutfitPopup())
+        self.editOutfit_b = tk.Button(self.o_option_fr, text='Edit', command=lambda: self.test())
         self.viewOutfit_b = tk.Button(self.o_option_fr, text='View', command=lambda: self.viewOutfit())
         self.delOutfit_b = tk.Button(self.o_option_fr, text='Delete', command=lambda: self.addOutfitPopup())
 
@@ -77,6 +77,9 @@ class OutfitFrame(tk.Frame):
         self.delOutfit_b.grid(row=0,column=3,sticky="NW")
 
         self.o_option_fr.grid(row=2,column=0,sticky="NW")
+    
+    def test(self):
+        print(f"[TEST1]: {self.user.get_all().get('0').get_all()}")
 
     def updateNetClothing(self):
         self.net_clothing = []
@@ -141,7 +144,7 @@ class OutfitFrame(tk.Frame):
         self.addOutfitLB()
     
     def addOutfitLB(self):
-
+        self.updateNetClothing()
         self.sepNetClothing()
 
         """
@@ -496,6 +499,12 @@ class ClosetFrame(tk.Frame):
         self.updateClothingList()
         # Update user clothing list
         self.save_to_user()
+
+    # def saveCurrent(self):
+    #     self.all_clothing[self.edit_select[0]].save(name=self.edit_n_var.get(), desc=self.edit_d_txt.get("1.0",tk.END).replace('\n',' '), clean=self.edit_clean_var.get(), type=self.edit_type_var.get())
+    #     print(f"[SAVED] {self.all_clothing[self.edit_select[0]].get_info()}")
+
+    #     self.updateClothingList()
 
         
 
