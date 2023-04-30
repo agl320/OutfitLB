@@ -60,7 +60,7 @@ class OutfitFrame(tk.Frame):
         self.sb['command'] = self.outfit_lb.yview
 
         self.addOutfit_b = tk.Button(self.o_option_fr, text='New', command=lambda: self.addOutfitPopup())
-        self.editOutfit_b = tk.Button(self.o_option_fr, text='Edit', command=lambda: self.test())
+        self.editOutfit_b = tk.Button(self.o_option_fr, text='Edit', command=lambda: self.editOutfitPopup())
         self.viewOutfit_b = tk.Button(self.o_option_fr, text='View', command=lambda: self.viewOutfit())
         self.delOutfit_b = tk.Button(self.o_option_fr, text='Delete', command=lambda: self.addOutfitPopup())
 
@@ -77,9 +77,77 @@ class OutfitFrame(tk.Frame):
         self.delOutfit_b.grid(row=0,column=3,sticky="NW")
 
         self.o_option_fr.grid(row=2,column=0,sticky="NW")
-    
-    def test(self):
-        print(f"[TEST1]: {self.user.get_all().get('0').get_all()}")
+
+    def saveOutfitList(self):
+        self.all_outfits[self.outfit_lb.curselection()[0]].set_name(self.edit_n_en.get()) 
+        print(f"[>] SAVED: {self.all_outfits}")
+        self.updateOutfitList()
+
+        self.edit_outfit_window.destroy()
+
+    def editOutfitPopup(self):
+        self.updateNetClothing()
+        self.sepNetClothing()
+
+        self.edit_outfit_window = tk.Toplevel(self)
+        # grab_set() to isolate actions to window
+        self.edit_outfit_window.grab_set()
+
+        # CREATE name var
+        self.edit_n_var = tk.StringVar()
+        self.edit_n_var.set("")
+        # Edit name frame
+        self.edit_n_en = tk.Entry(self.edit_outfit_window, textvariable=self.edit_n_var.get(), width=20)
+        
+        # FOR FINDING COMB. OF OUTFIT
+        top_val = 0
+        bot_val = 0
+        shoe_val = 0
+
+        if self.outfit_lb.curselection():
+
+            self.edit_n_var.set(self.all_outfits[self.outfit_lb.curselection()[0]].get_name())
+            self.edit_n_en.config(textvariable = self.edit_n_var)
+
+            # EDIT DEBUG
+            print("[EDIT]")
+            print(f"TOPLIST: {self.top_lst}")
+            print(f"BOTLIST: {self.bottom_lst}")
+            print(f"SHOELIST: {self.shoes_lst}")
+
+            # # FIND INDEX OF MATCHING IN LISTBOX
+            
+            for i, top in enumerate(self.top_lst):
+                if top == self.all_outfits[self.outfit_lb.curselection()[0]].top:
+                    top_val = i
+                else:
+                    print(f"{top} != {self.all_outfits[self.outfit_lb.curselection()[0]].top}")
+            
+            for i, bot in enumerate(self.bottom_lst):
+                if bot == self.all_outfits[self.outfit_lb.curselection()[0]].bottom:
+                    bot_val = i
+            
+            for i, shoe in enumerate(self.shoes_lst):
+                if shoe == self.all_outfits[self.outfit_lb.curselection()[0]].shoes:
+                    shoe_val = i
+
+            print(f"COMB: {top_val},{bot_val},{shoe_val}")
+        else:
+            print("[!] No outfit selected")
+
+        self.addOutfitLB(self.edit_outfit_window, top_val, bot_val, shoe_val)
+        
+        # save button
+        self.edit_save_b = tk.Button(self.edit_outfit_window, text="Save", command=lambda:self.saveOutfitList())
+
+        # cancel button
+        self.edit_cancel_b = tk.Button(self.edit_outfit_window, text="Cancel", command=lambda:self.edit_outfit_window.destroy)
+        
+        # widget placement
+        self.edit_n_en.grid(row=0,column=0,columnspan=2,sticky="NW")
+
+        self.edit_save_b.grid(row=2,column=0,sticky="NW")
+        self.edit_cancel_b.grid(row=2,column=1,sticky="NW")
 
     def updateNetClothing(self):
         self.net_clothing = []
@@ -104,7 +172,7 @@ class OutfitFrame(tk.Frame):
             elif clothing.get_type() == 2:
                 self.shoes_lst.append(clothing)
             else:
-                print("WARNING: Clothing of unknown type!")
+                print("[!] WARNING: Clothing of unknown type")
         
         print(f"NET CLOTHING: {self.net_clothing}")
 
@@ -118,10 +186,10 @@ class OutfitFrame(tk.Frame):
 
             self.o_view_name.grid(row=0,column=0,sticky="NW")
 
-            print("! Outfit selected")
+            print("[+]] Outfit selected")
             print(f"\t{self.o_view_name_var}")
         else:
-            print("! No outfit selected")
+            print("[+] No outfit selected")
 
 
     def addOutfitPopup(self):
@@ -135,15 +203,15 @@ class OutfitFrame(tk.Frame):
 
         self.add_outfit_b = tk.Button(self.add_outfit_window, text="Add", command=lambda: self.addOutfit())
 
-        self.back_outfit_b = tk.Button(self.add_outfit_window, text="Cancel", command=self.add_outfit_window.destroy)
+        self.back_outfit_b = tk.Button(self.add_outfit_window, text="Cancel", command=lambda: self.add_outfit_window.destroy)
 
         self.add_outfit_name.grid(row=0,column=0,columnspan = 2,sticky="NW")
         self.add_outfit_b.grid(row=2,column=0,sticky="NW")
         self.back_outfit_b.grid(row=2,column=1,sticky="NW")
 
-        self.addOutfitLB()
+        self.addOutfitLB(self.add_outfit_window)
     
-    def addOutfitLB(self):
+    def addOutfitLB(self, window, top_sel = 0, bot_sel = 0, shoe_sel = 0):
         self.updateNetClothing()
         self.sepNetClothing()
 
@@ -151,72 +219,92 @@ class OutfitFrame(tk.Frame):
         TOP
         """
         # Scrollbar and Listbox
-        self.sb_sep_top = tk.Scrollbar(self.add_outfit_window, orient=tk.VERTICAL) 
+        self.sb_sep_top = tk.Scrollbar(window, orient=tk.VERTICAL) 
         # display current list box of closet
-        self.outfit_sep_top_lb = tk.Listbox(self.add_outfit_window, exportselection=False, yscrollcommand = self.sb_sep_top.set, height = 10, width = 10,activestyle = 'dotbox',font = ("Helvetica",10),fg = "white")
+        self.outfit_sep_top_lb = tk.Listbox(window, exportselection=False, yscrollcommand = self.sb_sep_top.set, height = 10, width = 10,activestyle = 'dotbox',font = ("Helvetica",10),fg = "white")
         self.sb_sep_top['command'] = self.outfit_sep_top_lb.yview
 
-        self.updateSepTop()
+        self.updateSepTop(top_sel)
 
         """
         BOTTOM
         """
         # Scrollbar and Listbox
-        self.sb_sep_bottom = tk.Scrollbar(self.add_outfit_window, orient=tk.VERTICAL) 
+        self.sb_sep_bottom = tk.Scrollbar(window, orient=tk.VERTICAL) 
         # display current list box of closet
-        self.outfit_sep_bottom_lb = tk.Listbox(self.add_outfit_window, exportselection=False, yscrollcommand = self.sb_sep_bottom.set, height = 10, width = 10,activestyle = 'dotbox',font = ("Helvetica",10),fg = "white")
+        self.outfit_sep_bottom_lb = tk.Listbox(window, exportselection=False, yscrollcommand = self.sb_sep_bottom.set, height = 10, width = 10,activestyle = 'dotbox',font = ("Helvetica",10),fg = "white")
         self.sb_sep_bottom['command'] = self.outfit_sep_bottom_lb.yview
 
-        self.updateSepBottom()
+        self.updateSepBottom(bot_sel)
         """
         SHOES
         """
         # Scrollbar and Listbox
-        self.sb_sep_shoes = tk.Scrollbar(self.add_outfit_window, orient=tk.VERTICAL) 
+        self.sb_sep_shoes = tk.Scrollbar(window, orient=tk.VERTICAL) 
         # display current list box of closet
-        self.outfit_sep_shoes_lb = tk.Listbox(self.add_outfit_window, exportselection=False, yscrollcommand = self.sb_sep_shoes.set, height = 10, width = 10,activestyle = 'dotbox',font = ("Helvetica",10),fg = "white")
+        self.outfit_sep_shoes_lb = tk.Listbox(window, exportselection=False, yscrollcommand = self.sb_sep_shoes.set, height = 10, width = 10,activestyle = 'dotbox',font = ("Helvetica",10),fg = "white")
         self.sb_sep_shoes['command'] = self.outfit_sep_shoes_lb.yview
 
-        self.updateSepShoes()
+        self.updateSepShoes(shoe_sel)
 
         self.outfit_sep_top_lb.grid(row=1,column=0,sticky="NW")
         self.outfit_sep_bottom_lb.grid(row=1,column=1,sticky="NW")
         self.outfit_sep_shoes_lb.grid(row=1,column=2,sticky="NW")
 
-    def updateSepTop(self):
+    def updateSepTop(self, top_sel = 0):
         self.outfit_sep_top_lb.delete(0,tk.END)  
         for i, clothing in enumerate(self.top_lst):
             self.outfit_sep_top_lb.insert(i, clothing.get_name())
             self.outfit_sep_top_lb.itemconfig(i,{'bg':'Black'})
 
-    def updateSepBottom(self):
+        # PRE SELECT
+        self.outfit_sep_top_lb.selection_clear(0, tk.END)
+        self.outfit_sep_top_lb.selection_set(top_sel)
+
+    def updateSepBottom(self, bot_sel):
         self.outfit_sep_bottom_lb.delete(0,tk.END)  
         for i, clothing in enumerate(self.bottom_lst):
             self.outfit_sep_bottom_lb.insert(i, clothing.get_name())
             self.outfit_sep_bottom_lb.itemconfig(i,{'bg':'Blue'})
+        
+        # PRE SELECT
+        self.outfit_sep_bottom_lb.selection_clear(0, tk.END)
+        self.outfit_sep_bottom_lb.selection_set(bot_sel)
 
-    def updateSepShoes(self):
+    def updateSepShoes(self, shoe_sel):
         self.outfit_sep_shoes_lb.delete(0,tk.END)  
         for i, clothing in enumerate(self.shoes_lst):
             self.outfit_sep_shoes_lb.insert(i, clothing.get_name())
             self.outfit_sep_shoes_lb.itemconfig(i,{'bg':'Red'})
+        
+        # PRE SELECT
+        self.outfit_sep_shoes_lb.selection_clear(0, tk.END)
+        self.outfit_sep_shoes_lb.selection_set(shoe_sel)
 
     def addOutfit(self):
         self.add_o_name_var = self.add_o_name.get()
-        self.all_outfits.append(Outfit(self.add_o_name_var, self.outfit_sep_top_lb.curselection(), self.outfit_sep_bottom_lb.curselection(), self.outfit_sep_shoes_lb.curselection()))
+        self.all_outfits.append(Outfit(self.add_o_name_var, self.net_clothing[self.outfit_sep_top_lb.curselection()[0]], self.net_clothing[self.outfit_sep_bottom_lb.curselection()[0]], self.net_clothing[self.outfit_sep_shoes_lb.curselection()[0]]))
         
         print(f"ADDED OUTFIT: {self.add_o_name_var}")
         print(f"{self.outfit_sep_top_lb.curselection()}, {self.outfit_sep_bottom_lb.curselection()}, {self.outfit_sep_shoes_lb.curselection()}")
         self.add_outfit_window.destroy()
+
         self.updateOutfitList()
 
     def updateOutfitList(self):
+        # UPDATES LOCAL LIST
+        # UPDATES USER OUTFIT LIST
+        self.user.save_outfits(self.all_outfits)
+
+        # UPDATE LISTBOX
         self.outfit_lb.delete(0,tk.END)  
         for i, outfit in enumerate(self.all_outfits):
             self.outfit_lb.insert(i, outfit.get_name())
             self.outfit_lb.itemconfig(i,{'bg':'Black'})
         # debug print
         print(f"[+ outfit name:{outfit.get_name()}]")
+
+        
 
 
 class ClosetFrame(tk.Frame):
@@ -805,11 +893,14 @@ class ClosetFrame(tk.Frame):
         shirt_2 = Top("Black Shirt", "Black shirt I bought at McDonald's")
         shirt_3 = Top("Red Shirt", "Red shirt I bought at Arby's", clean=True)
         pants_1 = Bottom("Normal Jeans", "Taco", clean=True)
+        shoes_1 = Shoes("VBUX shoes", "Taco", clean=True)
 
         self.all_clothing.append(shirt_1)
         self.all_clothing.append(shirt_2)
         self.all_clothing.append(shirt_3)
         self.all_clothing.append(pants_1)
+        self.all_clothing.append(shoes_1)
+
 
         print("ADDING CLOTHING...")
 

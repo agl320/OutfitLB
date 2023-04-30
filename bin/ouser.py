@@ -52,6 +52,10 @@ class User():
         self.closet_lst[ID].set_closet(closet_new)
         print(f"UPDATED CLOSET [{ID}]: {self.closet_lst}")
 
+    def save_outfits(self,outfits_new):
+        self.outfit_lst = outfits_new
+        print(f"UPDATED OUTFITS: {self.outfit_lst}")
+
 class Outfit():
     def __init__(self, name, top, bottom, shoes):
         self.name = name
@@ -60,6 +64,12 @@ class Outfit():
         self.shoes = shoes 
     
     def get_name(self):
+        return self.name
+    
+    def set_name(self, new_name):
+        self.name = new_name 
+
+    def __repr__(self):
         return self.name
         
 # Closet class
