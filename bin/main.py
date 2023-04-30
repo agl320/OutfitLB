@@ -56,13 +56,16 @@ class OutfitFrame(tk.Frame):
         # Scrollbar and Listbox
         self.sb = tk.Scrollbar(self.o_lb_frame, orient=tk.VERTICAL) 
         # display current list box of closet
-        self.outfit_lb = tk.Listbox(self.o_lb_frame, yscrollcommand = self.sb.set, height = 10, width = 30,activestyle = 'dotbox',font = ("Helvetica",10),fg = "white")
+        self.outfit_lb = tk.Listbox(self.o_lb_frame, yscrollcommand = self.sb.set, height = 10, width = 30,activestyle = 'dotbox',font = ("Helvetica",10),fg = "black")
         self.sb['command'] = self.outfit_lb.yview
 
         self.addOutfit_b = tk.Button(self.o_option_fr, text='New', command=lambda: self.addOutfitPopup())
         self.editOutfit_b = tk.Button(self.o_option_fr, text='Edit', command=lambda: self.editOutfitPopup())
         self.viewOutfit_b = tk.Button(self.o_option_fr, text='View', command=lambda: self.viewOutfit())
-        self.delOutfit_b = tk.Button(self.o_option_fr, text='Delete', command=lambda: self.addOutfitPopup())
+        self.delOutfit_b = tk.Button(self.o_option_fr, text='Delete', command=lambda: self.delOutfitPopup())
+
+        # Find clean outfits
+        self.findCleanO_b = tk.Button(self.o_option_fr, text='Refresh Clean', command=lambda: self.updateOutfitList())
 
         # LB FRAME
         self.o_lb_frame.grid(row=0,column=0,sticky="NW")
@@ -76,11 +79,21 @@ class OutfitFrame(tk.Frame):
         self.viewOutfit_b.grid(row=0,column=2,sticky="NW")
         self.delOutfit_b.grid(row=0,column=3,sticky="NW")
 
+        self.findCleanO_b.grid(row=1,column=0,columnspan=3,sticky="NW")
+
         self.o_option_fr.grid(row=2,column=0,sticky="NW")
+
+    def delOutfitPopup(self):
+        self.del_outfit_confirm = tk.messagebox.askyesno(title="Confirm Delete", message=f"Are you sure you want to delete outfit: {self.outfit_lb.get(self.outfit_lb.curselection()[0])}")
+        
+        if self.del_outfit_confirm:
+            self.all_outfits.pop(self.outfit_lb.curselection()[0])
+            self.outfit_lb.delete(self.outfit_lb.curselection()[0])
+            self.updateOutfitList()
 
     def saveOutfitList(self):
         self.all_outfits[self.outfit_lb.curselection()[0]].set_name(self.edit_n_en.get()) 
-        self.all_outfits[self.outfit_lb.curselection()[0]].set_comb(self.checkIfRange(self.outfit_sep_top_lb), self.checkIfRange(self.outfit_sep_bottom_lb), self.checkIfRange(self.outfit_sep_shoes_lb)) 
+        self.all_outfits[self.outfit_lb.curselection()[0]].set_comb(self.checkIfRange(self.outfit_sep_top_lb, self.top_lst), self.checkIfRange(self.outfit_sep_bottom_lb, self.bottom_lst), self.checkIfRange(self.outfit_sep_shoes_lb, self.shoes_lst)) 
 
         print(f"[>] SAVED: {self.all_outfits}")
         self.updateOutfitList()
@@ -91,22 +104,21 @@ class OutfitFrame(tk.Frame):
         self.updateNetClothing()
         self.sepNetClothing()
 
-        self.edit_outfit_window = tk.Toplevel(self)
-        # grab_set() to isolate actions to window
-        self.edit_outfit_window.grab_set()
-
-        # CREATE name var
-        self.edit_n_var = tk.StringVar()
-        self.edit_n_var.set("")
-        # Edit name frame
-        self.edit_n_en = tk.Entry(self.edit_outfit_window, textvariable=self.edit_n_var.get(), width=20)
-        
-        # FOR FINDING COMB. OF OUTFIT
-        top_val = 0
-        bot_val = 0
-        shoe_val = 0
-
         if self.outfit_lb.curselection():
+            self.edit_outfit_window = tk.Toplevel(self)
+            # grab_set() to isolate actions to window
+            self.edit_outfit_window.grab_set()
+
+            # CREATE name var
+            self.edit_n_var = tk.StringVar()
+            self.edit_n_var.set("")
+            # Edit name frame
+            self.edit_n_en = tk.Entry(self.edit_outfit_window, textvariable=self.edit_n_var.get(), width=20)
+            
+            # FOR FINDING COMB. OF OUTFIT
+            top_val = 0
+            bot_val = 0
+            shoe_val = 0
 
             self.edit_n_var.set(self.all_outfits[self.outfit_lb.curselection()[0]].get_name())
             self.edit_n_en.config(textvariable = self.edit_n_var)
@@ -134,22 +146,26 @@ class OutfitFrame(tk.Frame):
                     shoe_val = i
 
             print(f"COMB: {top_val},{bot_val},{shoe_val}")
+
+            self.addOutfitLB(self.edit_outfit_window, top_val, bot_val, shoe_val)
+        
+            # save button
+            self.edit_save_b = tk.Button(self.edit_outfit_window, text="Save", command=lambda:self.saveOutfitList())
+
+            # cancel button
+            self.edit_cancel_b = tk.Button(self.edit_outfit_window, text="Cancel", command=lambda:self.edit_outfit_window.destroy())
+            
+            # widget placement
+            self.edit_n_en.grid(row=0,column=0,columnspan=2,sticky="NW")
+
+            self.edit_save_b.grid(row=2,column=0,sticky="NW")
+            self.edit_cancel_b.grid(row=2,column=1,sticky="NW")
         else:
-            print("[!] No outfit selected")
+            tk.messagebox.showwarning(title="Error", message="No outfit selected!")
 
-        self.addOutfitLB(self.edit_outfit_window, top_val, bot_val, shoe_val)
-        
-        # save button
-        self.edit_save_b = tk.Button(self.edit_outfit_window, text="Save", command=lambda:self.saveOutfitList())
+            print("[!] No outfit selected.")
 
-        # cancel button
-        self.edit_cancel_b = tk.Button(self.edit_outfit_window, text="Cancel", command=lambda:self.edit_outfit_window.destroy)
-        
-        # widget placement
-        self.edit_n_en.grid(row=0,column=0,columnspan=2,sticky="NW")
-
-        self.edit_save_b.grid(row=2,column=0,sticky="NW")
-        self.edit_cancel_b.grid(row=2,column=1,sticky="NW")
+       
 
     def updateNetClothing(self):
         self.net_clothing = []
@@ -223,7 +239,7 @@ class OutfitFrame(tk.Frame):
         # Scrollbar and Listbox
         self.sb_sep_top = tk.Scrollbar(window, orient=tk.VERTICAL) 
         # display current list box of closet
-        self.outfit_sep_top_lb = tk.Listbox(window, exportselection=False, yscrollcommand = self.sb_sep_top.set, height = 10, width = 10,activestyle = 'dotbox',font = ("Helvetica",10),fg = "white")
+        self.outfit_sep_top_lb = tk.Listbox(window, exportselection=False, yscrollcommand = self.sb_sep_top.set, height = 10, width = 10,activestyle = 'dotbox',font = ("Helvetica",10),fg = "black")
         self.sb_sep_top['command'] = self.outfit_sep_top_lb.yview
 
         self.updateSepTop(top_sel)
@@ -234,7 +250,7 @@ class OutfitFrame(tk.Frame):
         # Scrollbar and Listbox
         self.sb_sep_bottom = tk.Scrollbar(window, orient=tk.VERTICAL) 
         # display current list box of closet
-        self.outfit_sep_bottom_lb = tk.Listbox(window, exportselection=False, yscrollcommand = self.sb_sep_bottom.set, height = 10, width = 10,activestyle = 'dotbox',font = ("Helvetica",10),fg = "white")
+        self.outfit_sep_bottom_lb = tk.Listbox(window, exportselection=False, yscrollcommand = self.sb_sep_bottom.set, height = 10, width = 10,activestyle = 'dotbox',font = ("Helvetica",10),fg = "black")
         self.sb_sep_bottom['command'] = self.outfit_sep_bottom_lb.yview
 
         self.updateSepBottom(bot_sel)
@@ -244,7 +260,7 @@ class OutfitFrame(tk.Frame):
         # Scrollbar and Listbox
         self.sb_sep_shoes = tk.Scrollbar(window, orient=tk.VERTICAL) 
         # display current list box of closet
-        self.outfit_sep_shoes_lb = tk.Listbox(window, exportselection=False, yscrollcommand = self.sb_sep_shoes.set, height = 10, width = 10,activestyle = 'dotbox',font = ("Helvetica",10),fg = "white")
+        self.outfit_sep_shoes_lb = tk.Listbox(window, exportselection=False, yscrollcommand = self.sb_sep_shoes.set, height = 10, width = 10,activestyle = 'dotbox',font = ("Helvetica",10),fg = "black")
         self.sb_sep_shoes['command'] = self.outfit_sep_shoes_lb.yview
 
         self.updateSepShoes(shoe_sel)
@@ -286,7 +302,7 @@ class OutfitFrame(tk.Frame):
     def addOutfit(self):
         self.add_o_name_var = self.add_o_name.get()
 
-        self.all_outfits.append(Outfit(self.add_o_name_var, self.checkIfRange(self.outfit_sep_top_lb), self.checkIfRange(self.outfit_sep_bottom_lb), self.checkIfRange(self.outfit_sep_shoes_lb)))
+        self.all_outfits.append(Outfit(self.add_o_name_var, self.checkIfRange(self.outfit_sep_top_lb, self.top_lst), self.checkIfRange(self.outfit_sep_bottom_lb, self.bottom_lst), self.checkIfRange(self.outfit_sep_shoes_lb, self.shoes_lst)))
         
         print(f"ADDED OUTFIT: {self.add_o_name_var}")
         print(f"{self.outfit_sep_top_lb.curselection()}, {self.outfit_sep_bottom_lb.curselection()}, {self.outfit_sep_shoes_lb.curselection()}")
@@ -303,13 +319,17 @@ class OutfitFrame(tk.Frame):
         self.outfit_lb.delete(0,tk.END)  
         for i, outfit in enumerate(self.all_outfits):
             self.outfit_lb.insert(i, outfit.get_name())
-            self.outfit_lb.itemconfig(i,{'bg':'Black'})
-        # debug print
-        print(f"[+ outfit name:{outfit.get_name()}]")
+            if outfit.isClean():
+                self.outfit_lb.itemconfig(i,{'bg':'#E4E4E4'})
+                print(f"{self.outfit_lb.get(i)} is clean")
+            else:
+                self.outfit_lb.itemconfig(i,{'bg':'#CFCFCF'})
+                print(f"{self.outfit_lb.get(i)} is not clean")
     
-    def checkIfRange(self, clothing_lb):
+    def checkIfRange(self, clothing_lb, lst):
+        # returns index of selected item in respective listbox
         try:
-            return self.net_clothing[clothing_lb.curselection()[0]]
+            return lst[clothing_lb.curselection()[0]]
         except:
             return None
 
@@ -350,7 +370,6 @@ class ClosetFrame(tk.Frame):
         self.all_clothing = self.user.get_closet('0').get_all()
         self.example_data()
 
-        
         # init no image filepath
         self.filepath_add=""
 
@@ -416,50 +435,56 @@ class ClosetFrame(tk.Frame):
     def getPreview(self):
         # gets selected item in listbox
         self.prev_select = self.clothing_lb.curselection()
-        # gets value of selected
-        # gets index of selected
-        print(f"Index: {self.prev_select[0]}")
-        print(self.all_clothing[self.prev_select[0]].print_info())
-        # check if no listbox item selected
-        
-        if not self.prev_select: 
+
+        if not self.prev_select:
+            tk.messagebox.showwarning(title="Error", message="No clothing selected!")
+
             print("[!] None selected.")
-            self.prev_label_var.set("None selected.")
-            self.prev_label.config(textvariable=self.prev_label_var)
-
-            #self.prev_label = tk.Label(self.parent, textvariable=self.prev_label_var, font=("Helvetica", 10),justify= tk.LEFT) 
-            self.prev_image = tk.Label(self.lb_preview, text="No image.")
-
         else:
-            print("[!] Selected")
-            #strvar.set(clothing_lb.get(c_selection))
-            self.prev_label_var.set(self.all_clothing[self.prev_select[0]].get_info())
-            self.prev_label.config(textvariable=self.prev_label_var)
-            #self.prev_label = tk.Label(self.parent, textvariable=self.prev_label_var, font=("Helvetica", 10),justify= tk.LEFT) 
-            # getting and displaying current clothing image
+            # gets value of selected
+            # gets index of selected
+            print(f"Index: {self.prev_select[0]}")
+            print(self.all_clothing[self.prev_select[0]].print_info())
+            # check if no listbox item selected
+            
+            if not self.prev_select: 
+                print("[!] None selected.")
+                self.prev_label_var.set("None selected.")
+                self.prev_label.config(textvariable=self.prev_label_var)
 
-            self.filepath_current = self.all_clothing[self.prev_select[0]].get_image()
-            if not self.filepath_current or self.filepath_current.isspace():
-                self.filepath_current = "image.jpg"
-                print("[!] No image for current")
-
-            self.image_current = Image.open(self.filepath_current).resize((100, 100))
-            self.image_current = ImageTk.PhotoImage(self.image_current)
-
-            self.prev_image.configure(image=self.image_current)
-            # prevent garbage collection
-            self.prev_image.image = self.image_current
-
-            # DISPLAY CKMEAN
-            if self.all_clothing[self.prev_select[0]].get_ckmean() == None:
-                print("[!] NO PIE CHART")
-
-                self.ckmeanGenerate(self.filepath_current)
-                
-                #plt.savefig('clothing_pie', bbox_inches='tight')
+                #self.prev_label = tk.Label(self.parent, textvariable=self.prev_label_var, font=("Helvetica", 10),justify= tk.LEFT) 
+                self.prev_image = tk.Label(self.lb_preview, text="No image.")
 
             else:
-                self.ckmeanDisplay(self.all_clothing[self.prev_select[0]].get_ckmean())
+                print("[!] Selected")
+                #strvar.set(clothing_lb.get(c_selection))
+                self.prev_label_var.set(self.all_clothing[self.prev_select[0]].get_info())
+                self.prev_label.config(textvariable=self.prev_label_var)
+                #self.prev_label = tk.Label(self.parent, textvariable=self.prev_label_var, font=("Helvetica", 10),justify= tk.LEFT) 
+                # getting and displaying current clothing image
+
+                self.filepath_current = self.all_clothing[self.prev_select[0]].get_image()
+                if not self.filepath_current or self.filepath_current.isspace():
+                    self.filepath_current = "image.jpg"
+                    print("[!] No image for current")
+
+                self.image_current = Image.open(self.filepath_current).resize((100, 100))
+                self.image_current = ImageTk.PhotoImage(self.image_current)
+
+                self.prev_image.configure(image=self.image_current)
+                # prevent garbage collection
+                self.prev_image.image = self.image_current
+
+                # DISPLAY CKMEAN
+                if self.all_clothing[self.prev_select[0]].get_ckmean() == None:
+                    print("[!] NO PIE CHART")
+
+                    self.ckmeanGenerate(self.filepath_current)
+                    
+                    #plt.savefig('clothing_pie', bbox_inches='tight')
+
+                else:
+                    self.ckmeanDisplay(self.all_clothing[self.prev_select[0]].get_ckmean())
 
     
     def navBar(self):
@@ -605,47 +630,48 @@ class ClosetFrame(tk.Frame):
         
 
     def editCurrent(self):
-        self.edit_window = tk.Toplevel(self.lb_preview)
-        # grab_set() to isolate actions to window
-        self.edit_window.grab_set()
-
-        # Edit name frame
-        self.edit_n_l = tk.Label(self.edit_window, text="Name",justify= tk.LEFT)
-
-        # CREATE name var
-        self.edit_n_var = tk.StringVar()
-        self.edit_n_var.set("")
-        self.edit_n_en = tk.Entry(self.edit_window, textvariable=self.edit_n_var.get(), width=40)
-
-        # Edit description frame
-        self.edit_d_l = tk.Label(self.edit_window, text="Description",justify= tk.LEFT)
-
-        # Text has no textvariable attribute, thus must use regular strings
-        self.edit_d_var = ""
-        self.edit_d_txt = tk.Text(self.edit_window,  width=30,height=10)
-        self.edit_d_txt.insert(tk.INSERT, self.edit_d_var)
-
-        
-
-        self.edit_image_b = tk.Button(self.edit_window, text="Image", command=lambda: self.imageUpload())
-
         # gets selected item in listbox
         self.edit_select = self.clothing_lb.curselection()
 
-        # Clean? checklist w/ Description frame
-        self.edit_clean_var =  tk.IntVar()
-        self.edit_clean_b = tk.Checkbutton(self.edit_window, text="Clean", variable=self.edit_clean_var)
-
-        # TYPE 
-        self.edit_type_var = tk.IntVar(self.edit_window, 0) # default value is top
-        self.edit_rb_t = tk.Radiobutton(self.edit_window, text="Top", variable=self.edit_type_var, value=0)
-        self.edit_rb_b = tk.Radiobutton(self.edit_window, text="Bottom", variable=self.edit_type_var, value=1)
-        self.edit_rb_s = tk.Radiobutton(self.edit_window, text="Shoes", variable=self.edit_type_var, value=2)
-
         if not self.edit_select:
+            tk.messagebox.showwarning(title="Error", message="No clothing selected!")
+
             print("[!] None selected.")
-            self.edit_n_var.set("None selected.")
         else:
+            self.edit_window = tk.Toplevel(self.lb_preview)
+            # grab_set() to isolate actions to window
+            self.edit_window.grab_set()
+
+            # Edit name frame
+            self.edit_n_l = tk.Label(self.edit_window, text="Name",justify= tk.LEFT)
+
+            # CREATE name var
+            self.edit_n_var = tk.StringVar()
+            self.edit_n_var.set("")
+            self.edit_n_en = tk.Entry(self.edit_window, textvariable=self.edit_n_var.get(), width=40)
+
+            # Edit description frame
+            self.edit_d_l = tk.Label(self.edit_window, text="Description",justify= tk.LEFT)
+
+            # Text has no textvariable attribute, thus must use regular strings
+            self.edit_d_var = ""
+            self.edit_d_txt = tk.Text(self.edit_window,  width=30,height=10)
+            self.edit_d_txt.insert(tk.INSERT, self.edit_d_var)
+
+            self.edit_image_b = tk.Button(self.edit_window, text="Image", command=lambda: self.imageUpload())
+
+            
+
+            # Clean? checklist w/ Description frame
+            self.edit_clean_var =  tk.IntVar()
+            self.edit_clean_b = tk.Checkbutton(self.edit_window, text="Clean", variable=self.edit_clean_var)
+
+            # TYPE 
+            self.edit_type_var = tk.IntVar(self.edit_window, 0) # default value is top
+            self.edit_rb_t = tk.Radiobutton(self.edit_window, text="Top", variable=self.edit_type_var, value=0)
+            self.edit_rb_b = tk.Radiobutton(self.edit_window, text="Bottom", variable=self.edit_type_var, value=1)
+            self.edit_rb_s = tk.Radiobutton(self.edit_window, text="Shoes", variable=self.edit_type_var, value=2)
+
             print("[!] Selected")
             #strvar.set(clothing_lb.get(c_selection))
 
@@ -673,25 +699,25 @@ class ClosetFrame(tk.Frame):
             
             self.edit_save = tk.Button(self.edit_window, text = "Save", command=lambda: self.saveCurrent())
 
-        self.edit_n_l.grid(row=0,column=0,sticky="NW")
-        self.edit_n_en.grid(row=1,column=0,sticky="NW")
+            self.edit_n_l.grid(row=0,column=0,sticky="NW")
+            self.edit_n_en.grid(row=1,column=0,sticky="NW")
 
-        # description
-        self.edit_d_l.grid(row=2,column=0,sticky="NW")
-        self.edit_d_txt.grid(row=3,column=0,rowspan=1,sticky="NW")
+            # description
+            self.edit_d_l.grid(row=2,column=0,sticky="NW")
+            self.edit_d_txt.grid(row=3,column=0,rowspan=1,sticky="NW")
 
-        # clean button
-        self.edit_clean_b.grid(row=4,column=0,rowspan=1,sticky="NW")
+            # clean button
+            self.edit_clean_b.grid(row=4,column=0,rowspan=1,sticky="NW")
 
-        # save button
-        self.edit_save.grid(row=5,column=0,sticky="NW")
+            # save button
+            self.edit_save.grid(row=5,column=0,sticky="NW")
 
-        # TYPE
-        self.edit_rb_t.grid(row=0,column=1,sticky="NW")
-        self.edit_rb_b.grid(row=1,column=1,sticky="NW")
-        self.edit_rb_s.grid(row=2,column=1,sticky="NW")
-        # edit image (under clothing type)
-        self.edit_image_b.grid(row=3,column=1,rowspan=1,sticky="NW")
+            # TYPE
+            self.edit_rb_t.grid(row=0,column=1,sticky="NW")
+            self.edit_rb_b.grid(row=1,column=1,sticky="NW")
+            self.edit_rb_s.grid(row=2,column=1,sticky="NW")
+            # edit image (under clothing type)
+            self.edit_image_b.grid(row=3,column=1,rowspan=1,sticky="NW")
 
     # SAVE CURRENT EDIT
     def saveCurrent(self):
@@ -699,6 +725,7 @@ class ClosetFrame(tk.Frame):
         print(f"[SAVED] {self.all_clothing[self.edit_select[0]].get_info()}")
 
         self.updateClothingList()
+        self.edit_window.destroy()
 
     def updateClothingList(self):
         self.clothing_lb.delete(0,tk.END)  

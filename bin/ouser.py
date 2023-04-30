@@ -82,6 +82,13 @@ class Outfit():
     
     def set_shoes(self, shoes_new):
         self.shoes = shoes_new
+    
+    def isClean(self):
+        print(f"OUTFIT CLEAN CHECK: {self.top}, {self.bottom}, {self.shoes}")
+        if (self.top==None or self.top.is_clean()) and (self.bottom==None or self.bottom.is_clean()) and (self.shoes==None or self.shoes.is_clean()):
+            return True
+        else:
+            return False
 
     def __repr__(self):
         return self.name
