@@ -68,6 +68,20 @@ class Outfit():
     
     def set_name(self, new_name):
         self.name = new_name 
+    
+    def set_comb(self, top_new, bottom_new, shoes_new):
+        self.top = top_new
+        self.bottom = bottom_new
+        self.shoes = shoes_new
+    
+    def set_top(self, top_new):
+        self.top = top_new
+    
+    def set_bottom(self, bottom_new):
+        self.bottom = bottom_new
+    
+    def set_shoes(self, shoes_new):
+        self.shoes = shoes_new
 
     def __repr__(self):
         return self.name

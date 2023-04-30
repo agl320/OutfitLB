@@ -80,6 +80,8 @@ class OutfitFrame(tk.Frame):
 
     def saveOutfitList(self):
         self.all_outfits[self.outfit_lb.curselection()[0]].set_name(self.edit_n_en.get()) 
+        self.all_outfits[self.outfit_lb.curselection()[0]].set_comb(self.checkIfRange(self.outfit_sep_top_lb), self.checkIfRange(self.outfit_sep_bottom_lb), self.checkIfRange(self.outfit_sep_shoes_lb)) 
+
         print(f"[>] SAVED: {self.all_outfits}")
         self.updateOutfitList()
 
@@ -283,7 +285,8 @@ class OutfitFrame(tk.Frame):
 
     def addOutfit(self):
         self.add_o_name_var = self.add_o_name.get()
-        self.all_outfits.append(Outfit(self.add_o_name_var, self.net_clothing[self.outfit_sep_top_lb.curselection()[0]], self.net_clothing[self.outfit_sep_bottom_lb.curselection()[0]], self.net_clothing[self.outfit_sep_shoes_lb.curselection()[0]]))
+
+        self.all_outfits.append(Outfit(self.add_o_name_var, self.checkIfRange(self.outfit_sep_top_lb), self.checkIfRange(self.outfit_sep_bottom_lb), self.checkIfRange(self.outfit_sep_shoes_lb)))
         
         print(f"ADDED OUTFIT: {self.add_o_name_var}")
         print(f"{self.outfit_sep_top_lb.curselection()}, {self.outfit_sep_bottom_lb.curselection()}, {self.outfit_sep_shoes_lb.curselection()}")
@@ -303,8 +306,13 @@ class OutfitFrame(tk.Frame):
             self.outfit_lb.itemconfig(i,{'bg':'Black'})
         # debug print
         print(f"[+ outfit name:{outfit.get_name()}]")
+    
+    def checkIfRange(self, clothing_lb):
+        try:
+            return self.net_clothing[clothing_lb.curselection()[0]]
+        except:
+            return None
 
-        
 
 
 class ClosetFrame(tk.Frame):
@@ -893,13 +901,12 @@ class ClosetFrame(tk.Frame):
         shirt_2 = Top("Black Shirt", "Black shirt I bought at McDonald's")
         shirt_3 = Top("Red Shirt", "Red shirt I bought at Arby's", clean=True)
         pants_1 = Bottom("Normal Jeans", "Taco", clean=True)
-        shoes_1 = Shoes("VBUX shoes", "Taco", clean=True)
 
         self.all_clothing.append(shirt_1)
         self.all_clothing.append(shirt_2)
         self.all_clothing.append(shirt_3)
         self.all_clothing.append(pants_1)
-        self.all_clothing.append(shoes_1)
+        
 
 
         print("ADDING CLOTHING...")
