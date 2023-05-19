@@ -7,4 +7,4 @@ CURRENT:
 TODO:
 - GUI 
 - Custom outfits
-- Sustainability via data
+- Data science/machine learning?
