@@ -5,6 +5,7 @@ CURRENT:
 - Utilizes k-mean clustering to return data on colour-preference in clothing set.
 
 TODO:
+- STORE DATA
 - GUI 
 - Custom outfits
 - Data science/machine learning?
