@@ -1,0 +1,114 @@
+{
+    "firstName": "GH",
+    "lastName": "Andrew",
+    "userName": "agl13",
+    "closets": [
+        {
+            "name": "Main-Closet",
+            "ID": "0",
+            "clothing": [
+                {
+                    "name": "Blue Shirt",
+                    "ID": "0000",
+                    "desc": "Blue shirt I bought at Wendy's",
+                    "colour": "#ffffff",
+                    "clean": 0,
+                    "type": 0,
+                    "filepath": "image.jpg",
+                    "ckmean": null
+                },
+                {
+                    "name": "Black Shirt",
+                    "ID": "0000",
+                    "desc": "Black shirt I bought at McDonald's",
+                    "colour": "#ffffff",
+                    "clean": 0,
+                    "type": 0,
+                    "filepath": "image.jpg",
+                    "ckmean": null
+                },
+                {
+                    "name": "Red Shirt",
+                    "ID": "0000",
+                    "desc": "Red shirt I bought at Arby's",
+                    "colour": "#ffffff",
+                    "clean": 1,
+                    "type": 0,
+                    "filepath": "image.jpg",
+                    "ckmean": null
+                },
+                {
+                    "name": "Normal Jeans",
+                    "ID": "0000",
+                    "desc": "Taco",
+                    "colour": "#ffffff",
+                    "clean": 1,
+                    "type": 1,
+                    "filepath": "image.jpg",
+                    "ckmean": null
+                },
+                {
+                    "name": "Doge",
+                    "ID": "0000",
+                    "desc": "Doge shoes ",
+                    "colour": "#ffffff",
+                    "clean": 1,
+                    "type": 2,
+                    "filepath": "",
+                    "ckmean": null
+                }
+            ]
+        },
+        {
+            "name": "Other-Closet",
+            "ID": "1",
+            "clothing": [
+                {
+                    "name": "Green Shirt",
+                    "ID": "0000",
+                    "desc": "Chicken nugets",
+                    "colour": "#ffffff",
+                    "clean": false,
+                    "type": 0,
+                    "filepath": "image.jpg",
+                    "ckmean": null
+                }
+            ]
+        }
+    ],
+    "outfits": [
+        {
+            "name": "Outfit-Name",
+            "top": {
+                "name": "Black Shirt",
+                "ID": "0000",
+                "desc": "Black shirt I bought at McDonald's",
+                "colour": "#ffffff",
+                "clean": 0,
+                "type": 0,
+                "filepath": "image.jpg",
+                "ckmean": null
+            },
+            "bottom": {
+                "name": "Normal Jeans",
+                "ID": "0000",
+                "desc": "Taco",
+                "colour": "#ffffff",
+                "clean": 1,
+                "type": 1,
+                "filepath": "image.jpg",
+                "ckmean": null
+            },
+            "shoes": {
+                "name": "Doge",
+                "ID": "0000",
+                "desc": "Doge shoes ",
+                "colour": "#ffffff",
+                "clean": 1,
+                "type": 2,
+                "filepath": "",
+                "ckmean": null
+            }
+        }
+    ]
+}

@@ -144,6 +144,7 @@ class OutfitFrame(tk.Frame):
         )
 
         print(f"[>] SAVED: {self.all_outfits}")
+
         self.updateOutfitList()
 
         self.edit_outfit_window.destroy()
@@ -184,7 +185,19 @@ class OutfitFrame(tk.Frame):
             # # FIND INDEX OF MATCHING IN LISTBOX
 
             for i, top in enumerate(self.top_lst):
-                if top == self.all_outfits[self.outfit_lb.curselection()[0]].top:
+                print("[=] FINDING MATCHING")
+                print(
+                    f"\t{top.get_ID()} ~ {self.all_outfits[self.outfit_lb.curselection()[0]].top.get_ID()}"
+                )
+                # AFTER ID FIX, USE THIS
+                # if (
+                #     top.get_ID()
+                #     == self.all_outfits[self.outfit_lb.curselection()[0]].top.get_ID()
+                # ):
+                if (
+                    top.get_name()
+                    == self.all_outfits[self.outfit_lb.curselection()[0]].top.get_name()
+                ):
                     top_val = i
                 else:
                     print(
@@ -526,8 +539,10 @@ class ClosetFrame(tk.Frame):
         )
 
         # + EXAMPLE DATA
-        self.all_clothing = self.user.get_closet("0").get_all()
-        self.example_data()
+        # self.all_clothing = self.user.get_closet("0").get_all()
+        # self.example_data()
+        self.dropdown.current(0)
+        self.dropdown_callback(None)
 
         # init no image filepath
         self.filepath_add = ""
@@ -803,14 +818,6 @@ class ClosetFrame(tk.Frame):
     def save_to_user(self):
         self.user.save_closet(self.all_clothing, self.dropdown.get().split()[1])
 
-    def callPreview(self):
-        """
-        Creates a preview frame and changes the contents of such preview frame.
-        Then places the preview frame using grid.
-        """
-        # self.previewframe = PreviewFrame(self.lb_preview, self.all_clothing, self.clothing_lb) # maybe self.lb_preview?
-        # self.previewframe.grid(row=0,column=2,sticky="NW")
-
     def delCurrent(self):
         confirm = tk.messagebox.askyesno(
             "Confirm Delete",
@@ -896,6 +903,7 @@ class ClosetFrame(tk.Frame):
             # strvar.set(clothing_lb.get(c_selection))
 
             print(f"[=>]: Name: {self.all_clothing[self.edit_select[0]].get_name()}")
+            print(f"[=>]: ID: {self.all_clothing[self.edit_select[0]].get_ID()}")
             print(f"[=>]: Desc: {self.all_clothing[self.edit_select[0]].get_desc()}")
             print(f"[=>]: Type: {self.all_clothing[self.edit_select[0]].get_type()}")
 
@@ -1096,8 +1104,9 @@ class ClosetFrame(tk.Frame):
                 case 0:
                     self.all_clothing.append(
                         Top(
-                            self.add_n_var,
-                            self.add_d_var,
+                            name=self.add_n_var,
+                            ID="0000",
+                            desc=self.add_d_var,
                             type=self.type_var.get(),
                             filepath=self.filepath_add,
                             clean=self.clean_var.get(),
@@ -1106,8 +1115,9 @@ class ClosetFrame(tk.Frame):
                 case 1:
                     self.all_clothing.append(
                         Bottom(
-                            self.add_n_var,
-                            self.add_d_var,
+                            name=self.add_n_var,
+                            ID="0000",
+                            desc=self.add_d_var,
                             type=self.type_var.get(),
                             filepath=self.filepath_add,
                             clean=self.clean_var.get(),
@@ -1116,8 +1126,9 @@ class ClosetFrame(tk.Frame):
                 case 2:
                     self.all_clothing.append(
                         Shoes(
-                            self.add_n_var,
-                            self.add_d_var,
+                            name=self.add_n_var,
+                            ID="0000",
+                            desc=self.add_d_var,
                             type=self.type_var.get(),
                             filepath=self.filepath_add,
                             clean=self.clean_var.get(),
@@ -1201,10 +1212,10 @@ class ClosetFrame(tk.Frame):
         self.refresh_b.grid(row=5, column=0, sticky="NW")
 
     def example_data(self):
-        shirt_1 = Top("Blue Shirt", "Blue shirt I bought at Wendy's")
-        shirt_2 = Top("Black Shirt", "Black shirt I bought at McDonald's")
-        shirt_3 = Top("Red Shirt", "Red shirt I bought at Arby's", clean=True)
-        pants_1 = Bottom("Normal Jeans", "Taco", clean=True)
+        shirt_1 = Top("Blue Shirt", "0000", "Blue shirt I bought at Wendy's")
+        shirt_2 = Top("Black Shirt", "0000", "Black shirt I bought at McDonald's")
+        shirt_3 = Top("Red Shirt", "0000", "Red shirt I bought at Arby's", clean=True)
+        pants_1 = Bottom("Normal Jeans", "0000", "Taco", clean=True)
 
         self.all_clothing.append(shirt_1)
         self.all_clothing.append(shirt_2)
@@ -1214,18 +1225,40 @@ class ClosetFrame(tk.Frame):
         print("ADDING CLOTHING...")
 
         self.updateClothingList()
+        self.save_to_user()
 
         print("FINISHED ADDING CLOTHING")
 
+    # When user first imports data
+    def user_start(self):
+        self.dropdown_callback()
+        self.updateClothingList()
         self.save_to_user()
+        pass
 
 
 class MainApplication(tk.Frame):
-    def __init__(self, parent, user, *args, **kwargs):
+    def __init__(self, parent, *args, **kwargs):
         # not using super because tkinter uses old way
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
-        self.user = user
+
+        # # ACCOUNT
+        # agl13 = User("GH", "Andrew", "agl13")
+        # agl13.new_closet("AC", "0")
+        # agl13.new_closet("Buster-Wolf", "1")
+
+        Manager = Manage()
+        Manager.import_user("sample")
+
+        self.user = Manager.return_user("agl13")
+
+        # TOP FRAME
+        self.topframe = tk.Frame(self)
+        account_button = tk.Button(
+            self.topframe, text="Save", command=lambda: self.user.export_json()
+        )
+        account_button.grid(row=0, column=0)
 
         # left option, right action
         self.optionframe = tk.Frame(self)
@@ -1252,8 +1285,9 @@ class MainApplication(tk.Frame):
         self.oframe.grid(row=0, column=0, sticky="news")
 
         # MAIN
-        self.optionframe.grid(row=0, column=0, sticky="nw")
-        self.actionframe.grid(row=0, column=1, sticky="nw")
+        self.topframe.grid(row=0, column=0, sticky="news")
+        self.optionframe.grid(row=1, column=0, sticky="nw")
+        self.actionframe.grid(row=1, column=1, sticky="nw")
         self.actionframe.rowconfigure(0, weight=1)
         self.actionframe.columnconfigure(0, weight=1)
 
@@ -1266,12 +1300,8 @@ class MainApplication(tk.Frame):
 
 
 def main():
-    agl13 = User("GH", "Andrew", "agl13")
-    agl13.new_closet("AC", "0")
-    agl13.new_closet("Buster-Wolf", "1")
-
     root = tk.Tk()
-    MainApplication(root, agl13)
+    MainApplication(root)
     root.mainloop()
 
 

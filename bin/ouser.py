@@ -1,3 +1,107 @@
+import json
+
+
+class Manage:
+    def __init__(self):
+        self.user_lst = {}
+
+    def import_user(self, u_file):
+        print("[!] IMPORTING [!]")
+
+        # Deserialization
+        with open(f"{u_file}.json", "r") as read_file:
+            d_import = json.load(read_file)
+
+        # return username of imported user
+        # check if user exists; if so, delete
+        u_name = d_import["userName"]
+        try:
+            if self.user_lst[u_name]:
+                print("[!] User exists, overwritting...")
+                del self.user_lst[u_name]
+        except:
+            print("[!] User does not exist yet, creating new...")
+
+        # creation of empty new user
+        self.user_lst[u_name] = User(
+            d_import["firstName"], d_import["lastName"], u_name
+        )
+
+        for i, closet in enumerate(d_import["closets"]):
+            ID = d_import["closets"][i]["ID"]
+            self.user_lst[u_name].new_closet(d_import["closets"][i]["name"], ID)
+            for clothing in closet["clothing"]:
+                # multiple if statements in case each type of clothing has different attributes
+
+                if clothing["type"] == 0:
+                    self.user_lst[u_name].get_closet(ID).add_Top(
+                        clothing["name"],
+                        clothing["ID"],
+                        clothing["desc"],
+                        clothing["colour"],
+                        clothing["type"],
+                        clothing["filepath"],
+                        clothing["clean"],
+                    )
+                elif clothing["type"] == 1:
+                    self.user_lst[u_name].get_closet(ID).add_Bottom(
+                        clothing["name"],
+                        clothing["ID"],
+                        clothing["desc"],
+                        clothing["colour"],
+                        clothing["type"],
+                        clothing["filepath"],
+                        clothing["clean"],
+                    )
+                elif clothing["type"] == 2:
+                    self.user_lst[u_name].get_closet(ID).add_Shoes(
+                        clothing["name"],
+                        clothing["ID"],
+                        clothing["desc"],
+                        clothing["colour"],
+                        clothing["type"],
+                        clothing["filepath"],
+                        clothing["clean"],
+                    )
+                else:
+                    print("[X] Error in type import.")
+
+        for i, outfit in enumerate(d_import["outfits"]):
+            self.user_lst[u_name].new_outfit(
+                outfit["name"],
+                Top(
+                    outfit["top"]["name"],
+                    outfit["top"]["ID"],
+                    outfit["top"]["desc"],
+                    outfit["top"]["colour"],
+                    outfit["top"]["type"],
+                    outfit["top"]["filepath"],
+                    outfit["top"]["clean"],
+                ),
+                Bottom(
+                    outfit["bottom"]["name"],
+                    outfit["bottom"]["ID"],
+                    outfit["bottom"]["desc"],
+                    outfit["bottom"]["colour"],
+                    outfit["bottom"]["type"],
+                    outfit["bottom"]["filepath"],
+                    outfit["bottom"]["clean"],
+                ),
+                Shoes(
+                    outfit["shoes"]["name"],
+                    outfit["shoes"]["ID"],
+                    outfit["shoes"]["desc"],
+                    outfit["shoes"]["colour"],
+                    outfit["shoes"]["type"],
+                    outfit["shoes"]["filepath"],
+                    outfit["shoes"]["clean"],
+                ),
+            )
+
+    def return_user(self, u_name):
+        return self.user_lst[u_name]
+
+
 class User:
     def __init__(self, firstName, lastName, userName):
         self.firstName = firstName
@@ -9,8 +113,8 @@ class User:
     def new_outfit(self, name, top, bottom, shoes):
         self.outfit_lst.append(Outfit(name, top, bottom, shoes))
 
-    def new_closet(self, name, ID, desc=""):
-        self.closet_lst[ID] = Closet(name, desc)
+    def new_closet(self, name, ID):
+        self.closet_lst[ID] = Closet(name, ID)
 
     def delete_closet(self, ID):
         self.closet_lst.pop(ID, None)
@@ -55,6 +159,26 @@ class User:
     def save_outfits(self, outfits_new):
         self.outfit_lst = outfits_new
         print(f"UPDATED OUTFITS: {self.outfit_lst}")
+
+    def export_json(self):
+        print("[!] EXPORTING [!]")
+        print(self.closet_lst)
+        print(self.outfit_lst)
+        print([y.to_dict() for y in self.outfit_lst])
+
+        # Serializing json
+        d_export = {
+            "firstName": self.firstName,
+            "lastName": self.lastName,
+            "userName": self.userName,
+            "closets": [self.get_closet(x).to_dict() for x in self.closet_lst],
+            "outfits": [y.to_dict() for y in self.outfit_lst],
+        }
+        json_object = json.dumps(d_export, indent=4)
+
+        # Writing to sample.json
+        with open("sample.json", "w") as outfile:
+            outfile.write(json_object)
 
 
 class Outfit:
@@ -104,6 +228,14 @@ class Outfit:
         else:
             return False
 
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "top": self.top.to_dict(),
+            "bottom": self.bottom.to_dict(),
+            "shoes": self.shoes.to_dict(),
+        }
+
     def __repr__(self):
         return self.name
 
@@ -112,9 +244,10 @@ class Outfit:
 # - Closet contains dict of Clothing (Top, Bottom, Shoes)
 # - Methods to add clothing
 class Closet:
-    def __init__(self, name, desc=""):
+    def __init__(self, name, ID):
         self.clothing_lst = []
         self.name = name
+        self.ID = ID
 
     def add_Top(self, *args):
         self.clothing_lst.append(Top(*args))
@@ -131,6 +264,13 @@ class Closet:
 
     def set_closet(self, clothing_lst_new):
         self.clothing_lst = clothing_lst_new
+
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "ID": self.ID,
+            "clothing": [clothing.to_dict() for clothing in self.clothing_lst],
+        }
 
     def __repr__(self):
         return self.name
@@ -149,6 +289,7 @@ class Clothing:
     def __init__(
         self,
         name,
+        ID="0000",
         desc="",
         colour="#ffffff",
         type=0,
@@ -157,6 +298,7 @@ class Clothing:
         ckmean=None,
     ):
         self.name = name
+        self.ID = ID
         self.desc = desc
         self.colour = colour
         self.clean = clean
@@ -172,8 +314,11 @@ class Clothing:
         return self.name
 
     def get_info(self):
-        info_str = f"Name: {self.name}\nDescription: {self.desc}\nType: {self.type}"
+        info_str = f"Name: {self.name}\n\ID: {self.ID}\nDescription: {self.desc}\nType: {self.type}"
         return info_str
+
+    def get_ID(self):
+        return self.ID
 
     def get_desc(self):
         return self.desc
@@ -193,6 +338,18 @@ class Clothing:
     def print_info(self):
         print(f"Name: {self.name}")
         print(f"Description: {self.desc}")
+
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "ID": self.ID,
+            "desc": self.desc,
+            "colour": self.colour,
+            "clean": self.clean,
+            "type": self.type,
+            "filepath": self.filepath,
+            "ckmean": self.ckmean,
+        }
 
     """
     SETTERS
@@ -231,26 +388,41 @@ class Top(Clothing):
     def __init__(
         self,
         name,
+        ID="0000",
         desc="",
         colour="#ffffff",
         type=0,
-        sleeves=True,
+        # sleeves=True,
         filepath="image.jpg",
         clean=False,
     ):
-        super().__init__(name, desc, colour, type, filepath, clean)
-        self.sleeves = sleeves
+        super().__init__(name, ID, desc, colour, type, filepath, clean)
+        # self.sleeves = sleeves
 
 
 class Bottom(Clothing):
     def __init__(
-        self, name, desc="", colour="#ffffff", type=1, filepath="image.jpg", clean=False
+        self,
+        name,
+        ID="0000",
+        desc="",
+        colour="#ffffff",
+        type=1,
+        filepath="image.jpg",
+        clean=False,
     ):
-        super().__init__(name, desc, colour, type, filepath, clean)
+        super().__init__(name, ID, desc, colour, type, filepath, clean)
 
 
 class Shoes(Clothing):
     def __init__(
-        self, name, desc="", colour="#ffffff", type=2, filepath="image.jpg", clean=False
+        self,
+        name,
+        ID="0000",
+        desc="",
+        colour="#ffffff",
+        type=2,
+        filepath="image.jpg",
+        clean=False,
     ):
-        super().__init__(name, desc, colour, type, filepath, clean)
+        super().__init__(name, ID, desc, colour, type, filepath, clean)
