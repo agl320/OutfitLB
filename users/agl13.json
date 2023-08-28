@@ -2,6 +2,7 @@
     "firstName": "GH",
     "lastName": "Andrew",
     "userName": "agl13",
+    "loggedIn": 1,
     "closets": [
         {
             "name": "Main-Closet",
@@ -76,39 +77,5 @@
             ]
         }
     ],
-    "outfits": [
-        {
-            "name": "Outfit-Name",
-            "top": {
-                "name": "Black Shirt",
-                "ID": "0000",
-                "desc": "Black shirt I bought at McDonald's",
-                "colour": "#ffffff",
-                "clean": 0,
-                "type": 0,
-                "filepath": "image.jpg",
-                "ckmean": null
-            },
-            "bottom": {
-                "name": "Normal Jeans",
-                "ID": "0000",
-                "desc": "Taco",
-                "colour": "#ffffff",
-                "clean": 1,
-                "type": 1,
-                "filepath": "image.jpg",
-                "ckmean": null
-            },
-            "shoes": {
-                "name": "Doge",
-                "ID": "0000",
-                "desc": "Doge shoes ",
-                "colour": "#ffffff",
-                "clean": 1,
-                "type": 2,
-                "filepath": "",
-                "ckmean": null
-            }
-        }
-    ]
+    "outfits": []
 }

@@ -1,14 +1,15 @@
 {
-    "firstName": "GH",
-    "lastName": "Andrew",
-    "userName": "agl13",
+    "firstName": "Taco",
+    "lastName": "Bell",
+    "userName": "tbell2020",
+    "loggedIn": 0,
     "closets": [
         {
-            "name": "Main-Closet",
+            "name": "Sample-Closet",
             "ID": "0",
             "clothing": [
                 {
-                    "name": "Blue Shirt",
+                    "name": "Sample Blue Shirt",
                     "ID": "0000",
                     "desc": "Blue shirt I bought at Wendy's",
                     "colour": "#ffffff",
@@ -18,7 +19,7 @@
                     "ckmean": null
                 },
                 {
-                    "name": "Black Shirt",
+                    "name": "Sample Black Shirt",
                     "ID": "0000",
                     "desc": "Black shirt I bought at McDonald's",
                     "colour": "#ffffff",
@@ -76,5 +77,39 @@
             ]
         }
     ],
-    "outfits":[]
+    "outfits": [
+        {
+            "name": "Outfit-Name",
+            "top": {
+                "name": "Black Shirt",
+                "ID": "0000",
+                "desc": "Black shirt I bought at McDonald's",
+                "colour": "#ffffff",
+                "clean": 0,
+                "type": 0,
+                "filepath": "image.jpg",
+                "ckmean": null
+            },
+            "bottom": {
+                "name": "Normal Jeans",
+                "ID": "0000",
+                "desc": "Taco",
+                "colour": "#ffffff",
+                "clean": 1,
+                "type": 1,
+                "filepath": "image.jpg",
+                "ckmean": null
+            },
+            "shoes": {
+                "name": "Doge",
+                "ID": "0000",
+                "desc": "Doge shoes ",
+                "colour": "#ffffff",
+                "clean": 1,
+                "type": 2,
+                "filepath": "",
+                "ckmean": null
+            }
+        }
+    ]
 }

@@ -5,12 +5,27 @@ class Manage:
     def __init__(self):
         self.user_lst = {}
 
-    def import_user(self, u_file):
+    def userLogOut(self, u_file):
+        with open(u_file, "r") as read_file:
+            d_import = json.load(read_file)
+
+        d_import["loggedIn"] = 0
+
+        with open(u_file, "w") as json_file:
+            json.dump(d_import, json_file, indent=4)
+
+    def import_from_file(self, u_file):
         print("[!] IMPORTING [!]")
 
-        # Deserialization
-        with open(f"{u_file}.json", "r") as read_file:
+        with open(f"users/{u_file}.json", "r") as read_file:
             d_import = json.load(read_file)
+
+        # CHANGE TO LOGGED IN
+        d_import["loggedIn"] = 1
+
+        # Save the updated data back to the file
+        with open(f"users/{u_file}.json", "w") as json_file:
+            json.dump(d_import, json_file, indent=4)
 
         # return username of imported user
         # check if user exists; if so, delete
@@ -98,6 +113,8 @@ class Manage:
                 ),
             )
 
+        print(f"+++ USER LIST: {self.user_lst} +++")
+
     def return_user(self, u_name):
         return self.user_lst[u_name]
 
@@ -177,7 +194,7 @@ class User:
         json_object = json.dumps(d_export, indent=4)
 
         # Writing to sample.json
-        with open("sample.json", "w") as outfile:
+        with open("users/sample.json", "w") as outfile:
             outfile.write(json_object)
 
 

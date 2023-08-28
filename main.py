@@ -1,6 +1,7 @@
 # Cleaning code from main
 # removing use of global variables
 
+import os
 import tkinter as tk
 import matplotlib.pyplot as plt
 from tkinter import filedialog, ttk
@@ -1248,17 +1249,25 @@ class MainApplication(tk.Frame):
         # agl13.new_closet("AC", "0")
         # agl13.new_closet("Buster-Wolf", "1")
 
-        Manager = Manage()
-        Manager.import_user("sample")
+        # find all files ending in json, see which is logged in
+        self.Manager = Manage()
+        self.autoAssignLogin()
 
-        self.user = Manager.return_user("agl13")
+        self.initialWidgetDisplay()
 
+    def initialWidgetDisplay(self):
         # TOP FRAME
         self.topframe = tk.Frame(self)
+
         account_button = tk.Button(
-            self.topframe, text="Save", command=lambda: self.user.export_json()
+            self.topframe, text="Account", command=lambda: self.switchAccount()
         )
         account_button.grid(row=0, column=0)
+
+        save_button = tk.Button(
+            self.topframe, text="Save", command=lambda: self.user.export_json()
+        )
+        save_button.grid(row=0, column=1)
 
         # left option, right action
         self.optionframe = tk.Frame(self)
@@ -1268,8 +1277,38 @@ class MainApplication(tk.Frame):
         self.cframe = ClosetFrame(self.actionframe, self.user)
         self.oframe = OutfitFrame(self.actionframe, self.user)
 
-        parent.geometry("650x500")
-        parent.title("Outfit Manager")
+        self.parent.geometry("650x500")
+        self.parent.title("Outfit Manager")
+
+        # frame storing and management
+        self.all_frames = {}
+        self.all_frames["CFRAME"] = self.cframe
+        self.all_frames["OFRAME"] = self.oframe
+
+        # OPTION FRAME
+        self.switchframe = SwitchFrame(self.optionframe, self.all_frames)
+
+        # widget placement
+        self.grid(padx=5, pady=5)
+        self.cframe.grid(row=0, column=0, sticky="news")
+        self.oframe.grid(row=0, column=0, sticky="news")
+
+        # MAIN
+        self.topframe.grid(row=0, column=0, sticky="news")
+        self.optionframe.grid(row=1, column=0, sticky="nw")
+        self.actionframe.grid(row=1, column=1, sticky="nw")
+        self.actionframe.rowconfigure(0, weight=1)
+        self.actionframe.columnconfigure(0, weight=1)
+
+        # SHOW FRAME
+        self.showFrame("CFRAME")
+
+    def refreshWidget(self):
+        self.cframe.destroy()
+        self.oframe.destroy()
+
+        self.cframe = ClosetFrame(self.actionframe, self.user)
+        self.oframe = OutfitFrame(self.actionframe, self.user)
 
         # frame storing and management
         self.all_frames = {}
@@ -1297,6 +1336,63 @@ class MainApplication(tk.Frame):
     def showFrame(self, page_name):
         current_frame = self.all_frames[page_name]
         current_frame.tkraise()
+
+    def autoAssignLogin(self):
+        json_files = []
+
+        print("USERS FOLDER:")
+        print(os.path.join(os.getcwd(), "users"))
+
+        users_add = os.path.join(os.getcwd(), "users")
+        for files in os.walk(users_add):
+            for file in files[2]:
+                self.filepath = os.path.join(users_add, file)
+                with open(self.filepath, "r") as read_file:
+                    d_import = json.load(read_file)
+
+                    print(d_import["userName"])
+
+                    if d_import["loggedIn"]:
+                        u_name = d_import["userName"]
+                        self.Manager.import_from_file(f"{os.path.splitext(file)[0]}")
+                        self.user = self.Manager.return_user(u_name)
+
+                        print(f"+++ {u_name} IS LOGGED IN +++")
+                        break
+
+                if file.endswith(".json"):
+                    json_files.append(file)
+
+        print(json_files)
+
+    def switchAccount(self):
+        # GET OLD FILE_NAME
+        old_filepath = self.filepath
+
+        # uploading file
+        users_add = os.path.join(os.getcwd(), "users")
+
+        self.filepath = filedialog.askopenfilename(
+            initialdir=users_add,
+            filetypes=(("JSON files", "*.json"), ("All files", "*.*")),
+        )
+
+        if self.filepath:
+            filename = os.path.basename(self.filepath)
+
+        # LOG OUT USING OLD FILE_NAME
+        self.Manager.userLogOut(old_filepath)
+
+        with open(self.filepath, "r") as read_file:
+            d_import = json.load(read_file)
+
+            u_name = d_import["userName"]
+            self.Manager.import_from_file(f"{os.path.splitext(filename)[0]}")
+            self.user = self.Manager.return_user(u_name)
+
+            print(f"+++ {u_name} IS LOGGED IN +++")
+
+        self.refreshWidget()
 
 
 def main():
