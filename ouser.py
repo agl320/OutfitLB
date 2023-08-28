@@ -177,7 +177,7 @@ class User:
         self.outfit_lst = outfits_new
         print(f"UPDATED OUTFITS: {self.outfit_lst}")
 
-    def export_json(self):
+    def export_json(self, filepath):
         print("[!] EXPORTING [!]")
         print(self.closet_lst)
         print(self.outfit_lst)
@@ -188,14 +188,19 @@ class User:
             "firstName": self.firstName,
             "lastName": self.lastName,
             "userName": self.userName,
+            "loggedIn": 1,
             "closets": [self.get_closet(x).to_dict() for x in self.closet_lst],
             "outfits": [y.to_dict() for y in self.outfit_lst],
         }
         json_object = json.dumps(d_export, indent=4)
 
         # Writing to sample.json
-        with open("users/sample.json", "w") as outfile:
+        with open(filepath, "w") as outfile:
             outfile.write(json_object)
+
+        # # Writing to sample.json if FILE NAME
+        # with open(f"users/{filename}.json", "w") as outfile:
+        #     outfile.write(json_object)
 
 
 class Outfit:

@@ -57,6 +57,16 @@
                     "type": 2,
                     "filepath": "",
                     "ckmean": null
+                },
+                {
+                    "name": "chiggen",
+                    "ID": "0000",
+                    "desc": " ",
+                    "colour": "#ffffff",
+                    "clean": 0,
+                    "type": 1,
+                    "filepath": "",
+                    "ckmean": null
                 }
             ]
         },

@@ -1265,7 +1265,7 @@ class MainApplication(tk.Frame):
         account_button.grid(row=0, column=0)
 
         save_button = tk.Button(
-            self.topframe, text="Save", command=lambda: self.user.export_json()
+            self.topframe, text="Save", command=lambda: self.user.export_json(self.filepath)
         )
         save_button.grid(row=0, column=1)
 
