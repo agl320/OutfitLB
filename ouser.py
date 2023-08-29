@@ -17,14 +17,20 @@ class Manage:
     def import_from_file(self, u_file):
         print("[!] IMPORTING [!]")
 
-        with open(f"users/{u_file}.json", "r") as read_file:
+        # with open(f"users/{u_file}.json", "r") as read_file:
+        #     d_import = json.load(read_file)
+
+        with open(u_file, "r") as read_file:
             d_import = json.load(read_file)
 
         # CHANGE TO LOGGED IN
         d_import["loggedIn"] = 1
 
         # Save the updated data back to the file
-        with open(f"users/{u_file}.json", "w") as json_file:
+        # with open(f"users/{u_file}.json", "w") as json_file:
+        #     json.dump(d_import, json_file, indent=4)
+
+        with open(u_file, "w") as json_file:
             json.dump(d_import, json_file, indent=4)
 
         # return username of imported user

@@ -1,0 +1,8 @@
+{
+    "firstName": "FirstName",
+    "lastName": "LastName",
+    "userName": "username",
+    "loggedIn": 0,
+    "closets": [],
+    "outfits": []
+}

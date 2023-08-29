@@ -542,8 +542,11 @@ class ClosetFrame(tk.Frame):
         # + EXAMPLE DATA
         # self.all_clothing = self.user.get_closet("0").get_all()
         # self.example_data()
-        self.dropdown.current(0)
-        self.dropdown_callback(None)
+        try:
+            self.dropdown.current(0)
+            self.dropdown_callback(None)
+        except:
+            print("Dropdown items empty")
 
         # init no image filepath
         self.filepath_add = ""
@@ -687,7 +690,12 @@ class ClosetFrame(tk.Frame):
             textvariable=self.dropdown_var,
             values=self.user.get_all_closet_comb(),
         )
-        self.dropdown.current(0)
+
+        try:
+            self.dropdown.current(0)
+        except:
+            print("Dropdown items empty")
+
         self.dropdown.bind("<<ComboboxSelected>>", self.dropdown_callback)
 
         # Add closet
@@ -1255,17 +1263,98 @@ class MainApplication(tk.Frame):
 
         self.initialWidgetDisplay()
 
+    def optionsPopup(self):
+        optionsWindow = tk.Toplevel(self)
+        # self.add_window.geometry("200x200")
+        # grab_set() to isolate actions to window
+        optionsWindow.grab_set()
+
+        optionsFrame = tk.Frame(optionsWindow)
+        switch_button = tk.Button(
+            optionsFrame, text="Switch", command=lambda: self.switchAccount()
+        )
+
+        new_button = tk.Button(
+            optionsFrame, text="New", command=lambda: self.newAccountPopup()
+        )
+
+        optionsFrame.grid(row=0, column=0, sticky="NW")
+        switch_button.grid(row=0, column=0)
+        new_button.grid(row=1, column=0)
+
+    def newAccountPopup(self):
+        self.newWindow = tk.Toplevel(self)
+        # self.add_window.geometry("200x200")
+        # grab_set() to isolate actions to window
+        self.newWindow.grab_set()
+
+        newWindowFrame = tk.Frame(self.newWindow)
+
+        self.firstNameVar = tk.StringVar()
+        firstNameLabel = tk.Label(self.newWindow, text="First Name")
+        firstName = tk.Entry(self.newWindow, textvariable=self.firstNameVar)
+
+        self.lastNameVar = tk.StringVar()
+        lastNameLabel = tk.Label(self.newWindow, text="Last Name")
+        lastName = tk.Entry(self.newWindow, textvariable=self.lastNameVar)
+
+        self.usernameVar = tk.StringVar()
+        usernameLabel = tk.Label(self.newWindow, text="Username")
+        username = tk.Entry(self.newWindow, textvariable=self.usernameVar)
+
+        createButton = tk.Button(
+            self.newWindow, text="Create", command=lambda: self.createAccount()
+        )
+        cancelButton = tk.Button(
+            self.newWindow, text="Cancel", command=lambda: self.newWindow.destroy()
+        )
+
+        # WIDGET PLACEMENT
+        newWindowFrame.grid(row=0, column=0)
+
+        firstNameLabel.grid(row=0, column=0, columnspan=2)
+        firstName.grid(row=1, column=0, columnspan=2)
+
+        lastNameLabel.grid(row=2, column=0, columnspan=2)
+        lastName.grid(row=3, column=0, columnspan=2)
+
+        usernameLabel.grid(row=4, column=0, columnspan=2)
+        username.grid(row=5, column=0, columnspan=2)
+
+        createButton.grid(row=6, column=0)
+        cancelButton.grid(row=6, column=1)
+
+    def createAccount(self):
+        d_import = {
+            "firstName": self.firstNameVar.get(),
+            "lastName": self.lastNameVar.get(),
+            "userName": self.usernameVar.get(),
+            "loggedIn": 0,
+            "closets": [],
+            "outfits": [],
+        }
+
+        userpath = os.path.join(os.getcwd(), "users")
+        finalpath = os.path.join(userpath, f"{self.usernameVar.get()}.json")
+
+        with open(finalpath, "w") as json_file:
+            json.dump(d_import, json_file, indent=4)
+
+        self.newWindow.destroy()
+
     def initialWidgetDisplay(self):
         # TOP FRAME
         self.topframe = tk.Frame(self)
 
         account_button = tk.Button(
-            self.topframe, text="Account", command=lambda: self.switchAccount()
+            self.topframe, text="Account", command=lambda: self.optionsPopup()
         )
         account_button.grid(row=0, column=0)
 
         save_button = tk.Button(
-            self.topframe, text="Save", command=lambda: self.user.export_json(self.filepath)
+            self.topframe,
+            text="Save",
+            command=lambda: self.user.export_json(self.filepath),
         )
         save_button.grid(row=0, column=1)
 
@@ -1354,7 +1443,8 @@ class MainApplication(tk.Frame):
 
                     if d_import["loggedIn"]:
                         u_name = d_import["userName"]
-                        self.Manager.import_from_file(f"{os.path.splitext(file)[0]}")
+                        # self.Manager.import_from_file(f"{os.path.splitext(file)[0]}")
+                        self.Manager.import_from_file(self.filepath)
                         self.user = self.Manager.return_user(u_name)
 
                         print(f"+++ {u_name} IS LOGGED IN +++")
@@ -1380,17 +1470,18 @@ class MainApplication(tk.Frame):
         if self.filepath:
             filename = os.path.basename(self.filepath)
 
-        # LOG OUT USING OLD FILE_NAME
-        self.Manager.userLogOut(old_filepath)
-
         with open(self.filepath, "r") as read_file:
             d_import = json.load(read_file)
 
             u_name = d_import["userName"]
-            self.Manager.import_from_file(f"{os.path.splitext(filename)[0]}")
+            # self.Manager.import_from_file(f"{os.path.splitext(filename)[0]}")
+            self.Manager.import_from_file(self.filepath)
             self.user = self.Manager.return_user(u_name)
 
             print(f"+++ {u_name} IS LOGGED IN +++")
+
+            # LOG OUT USING OLD FILE_NAME
+            self.Manager.userLogOut(old_filepath)
 
         self.refreshWidget()
 
