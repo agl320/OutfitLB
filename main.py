@@ -1290,20 +1290,24 @@ class MainApplication(tk.Frame):
 
         newWindowFrame = tk.Frame(self.newWindow)
 
-        self.firstNameVar = tk.StringVar()
+        firstNameVar = tk.StringVar()
         firstNameLabel = tk.Label(self.newWindow, text="First Name")
-        firstName = tk.Entry(self.newWindow, textvariable=self.firstNameVar)
+        firstName = tk.Entry(self.newWindow, textvariable=firstNameVar)
 
-        self.lastNameVar = tk.StringVar()
+        lastNameVar = tk.StringVar()
         lastNameLabel = tk.Label(self.newWindow, text="Last Name")
-        lastName = tk.Entry(self.newWindow, textvariable=self.lastNameVar)
+        lastName = tk.Entry(self.newWindow, textvariable=lastNameVar)
 
-        self.usernameVar = tk.StringVar()
+        usernameVar = tk.StringVar()
         usernameLabel = tk.Label(self.newWindow, text="Username")
-        username = tk.Entry(self.newWindow, textvariable=self.usernameVar)
+        username = tk.Entry(self.newWindow, textvariable=usernameVar)
 
         createButton = tk.Button(
-            self.newWindow, text="Create", command=lambda: self.createAccount()
+            self.newWindow,
+            text="Create",
+            command=lambda: self.createAndClose(
+                firstNameVar.get(), lastNameVar.get(), usernameVar.get()
+            ),
         )
         cancelButton = tk.Button(
             self.newWindow, text="Cancel", command=lambda: self.newWindow.destroy()
@@ -1324,23 +1328,25 @@ class MainApplication(tk.Frame):
         createButton.grid(row=6, column=0)
         cancelButton.grid(row=6, column=1)
 
-    def createAccount(self):
+    def createAndClose(self, firstNameVar, lastNameVar, usernameVar, loggedIn=0):
+        self.createAccount(firstNameVar, lastNameVar, usernameVar, loggedIn)
+        self.newWindow.destroy()
+
+    def createAccount(self, firstNameVar, lastNameVar, usernameVar, loggedIn=0):
         d_import = {
-            "firstName": self.firstNameVar.get(),
-            "lastName": self.lastNameVar.get(),
-            "userName": self.usernameVar.get(),
-            "loggedIn": 0,
+            "firstName": firstNameVar,
+            "lastName": lastNameVar,
+            "userName": usernameVar,
+            "loggedIn": loggedIn,
             "closets": [],
             "outfits": [],
         }
 
         userpath = os.path.join(os.getcwd(), "users")
-        finalpath = os.path.join(userpath, f"{self.usernameVar.get()}.json")
+        finalpath = os.path.join(userpath, f"{usernameVar}.json")
 
         with open(finalpath, "w") as json_file:
             json.dump(d_import, json_file, indent=4)
-
-        self.newWindow.destroy()
 
     def initialWidgetDisplay(self):
         # TOP FRAME
@@ -1431,27 +1437,68 @@ class MainApplication(tk.Frame):
 
         print("USERS FOLDER:")
         print(os.path.join(os.getcwd(), "users"))
-
         users_add = os.path.join(os.getcwd(), "users")
+
+        # check if users folder exist
+        if os.path.exists(users_add):
+            print("> Users folder exists")
+        else:
+            print("! User folder does not exist")
+            print("> Creating new users folder")
+            os.makedirs(users_add)
+
         for files in os.walk(users_add):
             for file in files[2]:
-                self.filepath = os.path.join(users_add, file)
-                with open(self.filepath, "r") as read_file:
-                    d_import = json.load(read_file)
-
-                    print(d_import["userName"])
-
-                    if d_import["loggedIn"]:
-                        u_name = d_import["userName"]
-                        # self.Manager.import_from_file(f"{os.path.splitext(file)[0]}")
-                        self.Manager.import_from_file(self.filepath)
-                        self.user = self.Manager.return_user(u_name)
-
-                        print(f"+++ {u_name} IS LOGGED IN +++")
-                        break
-
                 if file.endswith(".json"):
                     json_files.append(file)
+
+        # check if no users
+        # if none, create one that is logged in
+        if len(json_files) == 0:
+            print("! No users in folder")
+            self.createAccount("First name", "Last name", "username", 1)
+
+        userCheck = False
+
+        for files in os.walk(users_add):
+            for file in files[2]:
+                if file.endswith(".json"):
+                    self.filepath = os.path.join(users_add, file)
+                    with open(self.filepath, "r") as read_file:
+                        d_import = json.load(read_file)
+
+                        print(d_import["userName"])
+
+                        if d_import["loggedIn"]:
+                            u_name = d_import["userName"]
+                            # self.Manager.import_from_file(f"{os.path.splitext(file)[0]}")
+                            self.Manager.import_from_file(self.filepath)
+                            self.user = self.Manager.return_user(u_name)
+
+                            print(f"+++ {u_name} IS LOGGED IN +++")
+                            userCheck = True
+                            break
+
+        # check if any users logged in
+        # at this point, a user must exist as a new would have been created if none existed
+        # if existed and none logged in, will just use the data from last variables but change loggedin to 1
+        if userCheck == False:
+            print("! No user logged in, logging in first user")
+            with open(self.filepath, "r") as read_file:
+                d_import = json.load(read_file)
+
+                print(d_import["userName"])
+
+                d_import["loggedIn"] = 1
+
+                if d_import["loggedIn"]:
+                    u_name = d_import["userName"]
+                    # self.Manager.import_from_file(f"{os.path.splitext(file)[0]}")
+                    self.Manager.import_from_file(self.filepath)
+                    self.user = self.Manager.return_user(u_name)
+
+                    print(f"+++ {u_name} IS LOGGED IN +++")
+                    userCheck = True
 
         print(json_files)
 
