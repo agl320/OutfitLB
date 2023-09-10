@@ -2,7 +2,7 @@
     "firstName": "A",
     "lastName": "L",
     "userName": "xxe",
-    "loggedIn": 1,
+    "loggedIn": 0,
     "closets": [
         {
             "name": "Main-Closet",

@@ -1,7 +1,6 @@
 # Cleaning code from main
 # removing use of global variables
 
-import copy
 import os
 import tkinter as tk
 import matplotlib.pyplot as plt
@@ -1488,7 +1487,7 @@ class MainApplication(tk.Frame):
                             userCheck = True
                             # not first user to be logged in
 
-                            self.old_filepath = copy.copy(self.filepath)
+                            self.old_filepath = self.filepath
 
                         elif d_import["loggedIn"] and userCheck == True:
                             print("\t\t> Logged in [/] AND not first user [X]")
