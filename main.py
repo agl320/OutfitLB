@@ -102,7 +102,7 @@ class OutfitFrame(tk.Frame):
         self.findCleanO_b = tk.Button(
             self.o_option_fr,
             text="Refresh",
-            command=lambda: self.updateOutfitList(),
+            command=lambda: self.updateOutfitAndClothing(),
         )
 
         # LB FRAME
@@ -444,6 +444,69 @@ class OutfitFrame(tk.Frame):
                 self.outfit_lb.itemconfig(i, {"bg": "red"})
                 print(f"{self.outfit_lb.get(i)} is not clean")
 
+    def updateFromClothing(self):
+        print("> Updating cleansiness from clothing list")
+
+        # must update self.all_outfits
+        for i, closet_id in enumerate(self.user.get_all_closet_id()):
+            print(f"> Checking closet w/ ID: {closet_id}")
+
+            # print(f"> User get all closets: {self.user.get_all_closet()}")
+            # print(f"> User get all: {self.user.get_all()}")
+
+            for j, clothing in enumerate(
+                self.user.get_closet(closet_id).get_all_clothing()
+            ):
+                print(
+                    f"\t> Checking {clothing.get_name()},ID={clothing.get_ID()} : {clothing.is_clean()}"
+                )
+
+                for k, outfit in enumerate(self.all_outfits):
+                    top = outfit.get_top()
+                    bot = outfit.get_bottom()
+                    shoes = outfit.get_shoes()
+
+                    if clothing.get_type() == 0 and top.get_ID() == clothing.get_ID():
+                        # outfit clothing -> clothing list clothing
+                        print(
+                            f"\t\t> {top.get_name()} is turning into {self.user.get_closet(closet_id).get_all_clothing()[j].is_clean()}"
+                        )
+
+                        self.all_outfits[k].get_top().set_clean(
+                            self.user.get_closet(closet_id)
+                            .get_all_clothing()[j]
+                            .is_clean()
+                        )
+                        # make self.all_clothing[] = same cleansiness
+                    elif clothing.get_type() == 1 and bot.get_ID() == clothing.get_ID():
+                        print(
+                            f"\t\t> {bot.get_name()} is turning into {self.user.get_closet(closet_id).get_all_clothing()[j].is_clean()}"
+                        )
+
+                        self.all_outfits[k].get_bottom().set_clean(
+                            self.user.get_closet(closet_id)
+                            .get_all_clothing()[j]
+                            .is_clean()
+                        )
+                        # make self.all_clothing[] = same cleansiness
+                    elif (
+                        clothing.get_type() == 2 and shoes.get_ID() == clothing.get_ID()
+                    ):
+                        print(
+                            f"\t\t> {shoes.get_name()} is turning into {self.user.get_closet(closet_id).get_all_clothing()[j].is_clean()}"
+                        )
+
+                        self.all_outfits[k].get_shoes().set_clean(
+                            self.user.get_closet(closet_id)
+                            .get_all_clothing()[j]
+                            .is_clean()
+                        )
+                        # make self.all_clothing[] = same cleansiness
+
+    def updateOutfitAndClothing(self):
+        self.updateFromClothing()
+        self.updateOutfitList()
+
     def changeOutfitList(self, state):
         print(f"Turning to {state}")
         # state in case make all dirty/clean
@@ -538,7 +601,7 @@ class ClosetFrame(tk.Frame):
         self.refresh_b = tk.Button(
             self.lb_frame,
             text="Refresh",
-            command=lambda: self.updateClothingList(),
+            command=lambda: self.updateClothingAndOutfit(),
         )
 
         # + EXAMPLE DATA
@@ -974,8 +1037,11 @@ class ClosetFrame(tk.Frame):
         self.updateClothingList()
         self.edit_window.destroy()
 
-    def updateClothingList(self):
+    def updateClothingAndOutfit(self):
         self.updateFromOutfit()
+        self.updateClothingList()
+
+    def updateClothingList(self):
         self.clothing_lb.delete(0, tk.END)
         for i, clothing in enumerate(self.all_clothing):
             self.clothing_lb.insert(i, clothing.get_name())
@@ -1176,7 +1242,13 @@ class ClosetFrame(tk.Frame):
             shoes = outfit.get_shoes()
 
             print(
-                f"\t> Checking {top.get_name()},ID={top.get_ID()} : {top.is_clean()} from outfit"
+                f"\t> Checking [0] {top.get_name()},ID={top.get_ID()} : {top.is_clean()} from outfit"
+            )
+            print(
+                f"\t> Checking [1] {bot.get_name()},ID={bot.get_ID()} : {bot.is_clean()} from outfit"
+            )
+            print(
+                f"\t> Checking [2] {shoes.get_name()},ID={shoes.get_ID()} : {shoes.is_clean()} from outfit"
             )
 
             for i, clothing in enumerate(self.all_clothing):

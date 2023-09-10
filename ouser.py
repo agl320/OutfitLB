@@ -154,6 +154,9 @@ class User:
     def get_all(self):
         return self.closet_lst.copy()
 
+    def get_all_closet(self):
+        return self.closet_lst
+
     def get_all_closet_name(self):
         # get closet list values in dict
         # wrap and convert to list since values() returns view
@@ -309,11 +312,18 @@ class Closet:
     def get_all(self):
         return self.clothing_lst.copy()
 
+    # Return all clothing in list form
+    def get_all_clothing(self):
+        return self.clothing_lst
+
     def set_closet(self, clothing_lst_new):
         self.clothing_lst = clothing_lst_new
 
     def get_ID(self):
         return self.ID
+
+    def get_name(self):
+        return self.name
 
     def to_dict(self):
         return {
