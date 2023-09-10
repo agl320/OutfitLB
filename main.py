@@ -90,12 +90,12 @@ class OutfitFrame(tk.Frame):
 
         # Make all clean
         self.makeClean_b = tk.Button(
-            self.o_option_fr, text="Clean", command=lambda: self.changeOutfitList(True)
+            self.o_option_fr, text="Clean", command=lambda: self.changeOutfitList(1)
         )
 
         # Make all dirty
         self.makeDirty_b = tk.Button(
-            self.o_option_fr, text="Dirty", command=lambda: self.changeOutfitList(False)
+            self.o_option_fr, text="Dirty", command=lambda: self.changeOutfitList(0)
         )
 
         # Find clean outfits
@@ -975,6 +975,7 @@ class ClosetFrame(tk.Frame):
         self.edit_window.destroy()
 
     def updateClothingList(self):
+        self.updateFromOutfit()
         self.clothing_lb.delete(0, tk.END)
         for i, clothing in enumerate(self.all_clothing):
             self.clothing_lb.insert(i, clothing.get_name())
@@ -1166,6 +1167,35 @@ class ClosetFrame(tk.Frame):
             print("[!] Closet does not exist")
 
         self.add_window.destroy()
+
+    def updateFromOutfit(self):
+        print("> Updating cleansiness from outfit list")
+        for outfit in self.user.get_outfits():
+            top = outfit.get_top()
+            bot = outfit.get_bottom()
+            shoes = outfit.get_shoes()
+
+            print(
+                f"\t> Checking {top.get_name()},ID={top.get_ID()} : {top.is_clean()} from outfit"
+            )
+
+            for i, clothing in enumerate(self.all_clothing):
+                print(
+                    f"\t> Comparing to {self.all_clothing[i].get_name()},ID={self.all_clothing[i].get_ID()} : {self.all_clothing[i].is_clean()} from clothing list"
+                )
+
+                if clothing.get_type() == 0 and top.get_ID() == clothing.get_ID():
+                    print(
+                        f"\t\t> {self.all_clothing[i].get_name()} is turning into {top.is_clean()}"
+                    )
+                    self.all_clothing[i].set_clean(top.is_clean())
+                    # make self.all_clothing[] = same cleansiness
+                elif clothing.get_type() == 1 and bot.get_ID() == clothing.get_ID():
+                    self.all_clothing[i].set_clean(bot.is_clean())
+                    # make self.all_clothing[] = same cleansiness
+                elif clothing.get_type() == 2 and shoes.get_ID() == clothing.get_ID():
+                    self.all_clothing[i].set_clean(shoes.is_clean())
+                    # make self.all_clothing[] = same cleansiness
 
     # WIDGET DISPLAYING
     # GRID FORMAT

@@ -29,8 +29,8 @@ class Manage:
         d_import["loggedIn"] = 1
 
         # Save the updated data back to the file
-        # with open(f"users/{u_file}.json", "w") as json_file:
-        #     json.dump(d_import, json_file, indent=4)
+        # with open(f"users/{u_file}.json", "w") as json_file:"
+        #     json.dump(d_import, json_file, indent=4)"
 
         with open(u_file, "w") as json_file:
             json.dump(d_import, json_file, indent=4)
@@ -311,6 +311,9 @@ class Closet:
 
     def set_closet(self, clothing_lst_new):
         self.clothing_lst = clothing_lst_new
+
+    def get_ID(self):
+        return self.ID
 
     def to_dict(self):
         return {
