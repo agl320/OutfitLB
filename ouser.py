@@ -8,11 +8,13 @@ class Manage:
     def userLogOut(self, u_file):
         with open(u_file, "r") as read_file:
             d_import = json.load(read_file)
+            read_file.close()
 
         d_import["loggedIn"] = 0
 
         with open(u_file, "w") as json_file:
             json.dump(d_import, json_file, indent=4)
+            json_file.close()
 
     def import_from_file(self, u_file):
         print("[!] IMPORTING [!]")

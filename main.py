@@ -1,6 +1,7 @@
 # Cleaning code from main
 # removing use of global variables
 
+import copy
 import os
 import tkinter as tk
 import matplotlib.pyplot as plt
@@ -176,6 +177,7 @@ class OutfitFrame(tk.Frame):
                 self.all_outfits[self.outfit_lb.curselection()[0]].get_name()
             )
             self.edit_n_en.config(textvariable=self.edit_n_var)
+            # when updated, self.edit_n_var.get()
 
             # EDIT DEBUG
             print("[EDIT]")
@@ -1443,10 +1445,11 @@ class MainApplication(tk.Frame):
         if os.path.exists(users_add):
             print("> Users folder exists")
         else:
-            print("! User folder does not exist")
-            print("> Creating new users folder")
+            print("> User folder does not exist")
+            print("\t> Creating new users folder")
             os.makedirs(users_add)
 
+        print("> Checking if users exist in folder...")
         for files in os.walk(users_add):
             for file in files[2]:
                 if file.endswith(".json"):
@@ -1455,11 +1458,14 @@ class MainApplication(tk.Frame):
         # check if no users
         # if none, create one that is logged in
         if len(json_files) == 0:
-            print("! No users in folder")
+            print("\t> No users in folder")
             self.createAccount("First name", "Last name", "username", 1)
+        else:
+            print("\t> Users exist in folder")
 
         userCheck = False
 
+        print("> Iterating through users...")
         for files in os.walk(users_add):
             for file in files[2]:
                 if file.endswith(".json"):
@@ -1467,9 +1473,12 @@ class MainApplication(tk.Frame):
                     with open(self.filepath, "r") as read_file:
                         d_import = json.load(read_file)
 
-                        print(d_import["userName"])
+                        print(f"\t> Checking user: {d_import['userName']}")
+                        print(f"\t\t> Filepath: {self.filepath}")
 
-                        if d_import["loggedIn"]:
+                        if d_import["loggedIn"] and userCheck == False:
+                            print("\t\t> Logged in [/] AND is first user [X]")
+
                             u_name = d_import["userName"]
                             # self.Manager.import_from_file(f"{os.path.splitext(file)[0]}")
                             self.Manager.import_from_file(self.filepath)
@@ -1477,13 +1486,29 @@ class MainApplication(tk.Frame):
 
                             print(f"+++ {u_name} IS LOGGED IN +++")
                             userCheck = True
-                            break
+                            # not first user to be logged in
+
+                            self.old_filepath = copy.copy(self.filepath)
+
+                        elif d_import["loggedIn"] and userCheck == True:
+                            print("\t\t> Logged in [/] AND not first user [X]")
+                            u_name = d_import["userName"]
+                            d_import["loggedIn"] = 0
+                            print(
+                                f"\t\t> An account already logged in, {u_name} logging out +++"
+                            )
+                            with open(self.filepath, "w") as update_file:
+                                json.dump(d_import, update_file, indent=4)
+                                update_file.close()
+                        else:
+                            print("\t\t> Not logged in")
 
         # check if any users logged in
         # at this point, a user must exist as a new would have been created if none existed
         # if existed and none logged in, will just use the data from last variables but change loggedin to 1
+        print("> Checking if any user already logged in...")
         if userCheck == False:
-            print("! No user logged in, logging in first user")
+            print("\t> No user logged in, logging in first user available")
             with open(self.filepath, "r") as read_file:
                 d_import = json.load(read_file)
 
@@ -1491,6 +1516,7 @@ class MainApplication(tk.Frame):
 
                 d_import["loggedIn"] = 1
 
+                # first user ot be logged in
                 if d_import["loggedIn"]:
                     u_name = d_import["userName"]
                     # self.Manager.import_from_file(f"{os.path.splitext(file)[0]}")
@@ -1499,12 +1525,17 @@ class MainApplication(tk.Frame):
 
                     print(f"+++ {u_name} IS LOGGED IN +++")
                     userCheck = True
+        else:
+            print("\t> User logged in already")
 
         print(json_files)
+        print(f"> Old filepath (LOGGED IN): {self.old_filepath}")
 
     def switchAccount(self):
+        print("> Switching account initiated!")
+        print(f"\t> Old filepath: {self.old_filepath}")
         # GET OLD FILE_NAME
-        old_filepath = self.filepath
+        # self.old_filepath = self.filepath
 
         # uploading file
         users_add = os.path.join(os.getcwd(), "users")
@@ -1514,8 +1545,12 @@ class MainApplication(tk.Frame):
             filetypes=(("JSON files", "*.json"), ("All files", "*.*")),
         )
 
-        if self.filepath:
-            filename = os.path.basename(self.filepath)
+        # if self.filepath:
+        #     filename = os.path.basename(self.filepath)
+
+        # LOG OUT USING OLD FILE_NAME
+        print(f"+++ {self.old_filepath} IS LOGGED OUT +++")
+        self.Manager.userLogOut(self.old_filepath)
 
         with open(self.filepath, "r") as read_file:
             d_import = json.load(read_file)
@@ -1525,10 +1560,13 @@ class MainApplication(tk.Frame):
             self.Manager.import_from_file(self.filepath)
             self.user = self.Manager.return_user(u_name)
 
-            print(f"+++ {u_name} IS LOGGED IN +++")
+        # Change LoggedIn status
+        d_import["loggedIn"] = 1
+        with open(self.filepath, "w") as update_file:
+            json.dump(d_import, update_file, indent=4)
+            update_file.close()
 
-            # LOG OUT USING OLD FILE_NAME
-            self.Manager.userLogOut(old_filepath)
+        print(f"+++ {u_name} IS LOGGED IN +++")
 
         self.refreshWidget()
 
