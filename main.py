@@ -123,6 +123,8 @@ class OutfitFrame(tk.Frame):
 
         self.o_option_fr.grid(row=2, column=0, sticky="NW")
 
+        self.updateOutfitList()
+
     def delOutfitPopup(self):
         self.del_outfit_confirm = tk.messagebox.askyesno(
             title="Confirm Delete",
@@ -135,14 +137,14 @@ class OutfitFrame(tk.Frame):
             self.updateOutfitList()
 
     def saveOutfitList(self):
-        self.all_outfits[self.outfit_lb.curselection()[0]].set_name(
-            self.edit_n_en.get()
-        )
-        self.all_outfits[self.outfit_lb.curselection()[0]].set_comb(
+        self.all_outfits[self.outfit_select[0]].set_name(self.edit_n_en.get())
+        self.all_outfits[self.outfit_select[0]].set_comb(
             self.checkIfRange(self.outfit_sep_top_lb, self.top_lst),
             self.checkIfRange(self.outfit_sep_bottom_lb, self.bottom_lst),
             self.checkIfRange(self.outfit_sep_shoes_lb, self.shoes_lst),
         )
+
+        print(self.all_outfits[self.outfit_lb.curselection()[0]])
 
         print(f"[>] SAVED: {self.all_outfits}")
 
@@ -151,6 +153,8 @@ class OutfitFrame(tk.Frame):
         self.edit_outfit_window.destroy()
 
     def editOutfitPopup(self):
+        self.outfit_select = self.outfit_lb.curselection()
+
         self.updateNetClothing()
         self.sepNetClothing()
 
@@ -172,9 +176,7 @@ class OutfitFrame(tk.Frame):
             bot_val = 0
             shoe_val = 0
 
-            self.edit_n_var.set(
-                self.all_outfits[self.outfit_lb.curselection()[0]].get_name()
-            )
+            self.edit_n_var.set(self.all_outfits[self.outfit_select[0]].get_name())
             self.edit_n_en.config(textvariable=self.edit_n_var)
             # when updated, self.edit_n_var.get()
 
@@ -189,7 +191,7 @@ class OutfitFrame(tk.Frame):
             for i, top in enumerate(self.top_lst):
                 print("[=] FINDING MATCHING")
                 print(
-                    f"\t{top.get_ID()} ~ {self.all_outfits[self.outfit_lb.curselection()[0]].top.get_ID()}"
+                    f"\t{top.get_ID()} ~ {self.all_outfits[self.outfit_select[0]].top.get_ID()}"
                 )
                 # AFTER ID FIX, USE THIS
                 # if (
@@ -198,20 +200,18 @@ class OutfitFrame(tk.Frame):
                 # ):
                 if (
                     top.get_name()
-                    == self.all_outfits[self.outfit_lb.curselection()[0]].top.get_name()
+                    == self.all_outfits[self.outfit_select[0]].top.get_name()
                 ):
                     top_val = i
                 else:
-                    print(
-                        f"{top} != {self.all_outfits[self.outfit_lb.curselection()[0]].top}"
-                    )
+                    print(f"{top} != {self.all_outfits[self.outfit_select[0]].top}")
 
             for i, bot in enumerate(self.bottom_lst):
-                if bot == self.all_outfits[self.outfit_lb.curselection()[0]].bottom:
+                if bot == self.all_outfits[self.outfit_select[0]].bottom:
                     bot_val = i
 
             for i, shoe in enumerate(self.shoes_lst):
-                if shoe == self.all_outfits[self.outfit_lb.curselection()[0]].shoes:
+                if shoe == self.all_outfits[self.outfit_select[0]].shoes:
                     shoe_val = i
 
             print(f"COMB: {top_val},{bot_val},{shoe_val}")
@@ -486,7 +486,8 @@ class OutfitFrame(tk.Frame):
         try:
             return lst[clothing_lb.curselection()[0]]
         except:
-            return None
+            print("Missing some piece; cannot make outfit")
+            self.add_outfit_window.destroy()
 
 
 class ClosetFrame(tk.Frame):
@@ -1524,6 +1525,7 @@ class MainApplication(tk.Frame):
 
                     print(f"+++ {u_name} IS LOGGED IN +++")
                     userCheck = True
+            self.old_filepath = self.filepath
         else:
             print("\t> User logged in already")
 

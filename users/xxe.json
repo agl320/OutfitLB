@@ -2,7 +2,7 @@
     "firstName": "A",
     "lastName": "L",
     "userName": "xxe",
-    "loggedIn": 0,
+    "loggedIn": 1,
     "closets": [
         {
             "name": "Main-Closet",
@@ -47,9 +47,53 @@
                     "type": 1,
                     "filepath": "",
                     "ckmean": null
+                },
+                {
+                    "name": "Adidas UB White",
+                    "ID": "0000",
+                    "desc": "1.0 ",
+                    "colour": "#ffffff",
+                    "clean": 1,
+                    "type": 2,
+                    "filepath": "",
+                    "ckmean": null
                 }
             ]
         }
     ],
-    "outfits": []
+    "outfits": [
+        {
+            "name": "Outfit-Name",
+            "top": {
+                "name": "POLO T-shirt",
+                "ID": "0000",
+                "desc": "White 1967 ",
+                "colour": "#ffffff",
+                "clean": 1,
+                "type": 0,
+                "filepath": "",
+                "ckmean": null
+            },
+            "bottom": {
+                "name": "Levi Jeans Bgy",
+                "ID": "0000",
+                "desc": "Baggy ",
+                "colour": "#ffffff",
+                "clean": 1,
+                "type": 1,
+                "filepath": "",
+                "ckmean": null
+            },
+            "shoes": {
+                "name": "Adidas UB White",
+                "ID": "0000",
+                "desc": "1.0 ",
+                "colour": "#ffffff",
+                "clean": 1,
+                "type": 2,
+                "filepath": "",
+                "ckmean": null
+            }
+        }
+    ]
 }

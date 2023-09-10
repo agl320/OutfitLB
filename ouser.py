@@ -259,12 +259,29 @@ class Outfit:
             return False
 
     def to_dict(self):
-        return {
-            "name": self.name,
-            "top": self.top.to_dict(),
-            "bottom": self.bottom.to_dict(),
-            "shoes": self.shoes.to_dict(),
-        }
+        tmp = {"name": self.name}
+
+        try:
+            tmp_top = {"top": self.top.to_dict()}
+        except:
+            print("ERROR: need top")
+            tmp_top = {"top": ""}
+
+        try:
+            tmp_bot = {"bottom": self.bottom.to_dict()}
+        except:
+            print("ERROR: need bottom")
+            tmp_bot = {"bottom": ""}
+
+        try:
+            tmp_shoes = {"shoes": self.shoes.to_dict()}
+        except:
+            print("ERROR: need shoes")
+            tmp_shoes = {"shoes": ""}
+
+        tmp_fin = tmp | tmp_top | tmp_bot | tmp_shoes
+
+        return tmp_fin
 
     def __repr__(self):
         return self.name
