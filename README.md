@@ -1,5 +1,6 @@
 # OutfitLB
 Stores and manages outfits and clothing.
+Run with `py .\main.py`
 
 What I want it to look like:
 ![OutfitLB-final-GH](https://github.com/xegativ/OutfitLB/assets/52055203/718d6669-9d05-43e6-a313-feb4ab584d32)
