@@ -2,6 +2,7 @@
 # removing use of global variables
 
 import os
+import random
 import tkinter as tk
 import matplotlib.pyplot as plt
 from tkinter import filedialog, ttk
@@ -101,7 +102,7 @@ class OutfitFrame(tk.Frame):
         # Find clean outfits
         self.findCleanO_b = tk.Button(
             self.o_option_fr,
-            text="Refresh",
+            text="Update from Closet",
             command=lambda: self.updateOutfitAndClothing(),
         )
 
@@ -119,7 +120,7 @@ class OutfitFrame(tk.Frame):
 
         self.makeClean_b.grid(row=1, column=0, columnspan=1, sticky="NW")
         self.makeDirty_b.grid(row=1, column=1, columnspan=1, sticky="NW")
-        self.findCleanO_b.grid(row=2, column=0, columnspan=1, sticky="NW")
+        self.findCleanO_b.grid(row=2, column=0, columnspan=2, sticky="NW")
 
         self.o_option_fr.grid(row=2, column=0, sticky="NW")
 
@@ -414,6 +415,7 @@ class OutfitFrame(tk.Frame):
         self.all_outfits.append(
             Outfit(
                 self.add_o_name_var,
+                self.genOutfitID(),
                 self.checkIfRange(self.outfit_sep_top_lb, self.top_lst),
                 self.checkIfRange(self.outfit_sep_bottom_lb, self.bottom_lst),
                 self.checkIfRange(self.outfit_sep_shoes_lb, self.shoes_lst),
@@ -427,6 +429,19 @@ class OutfitFrame(tk.Frame):
         self.add_outfit_window.destroy()
 
         self.updateOutfitList()
+
+    def genOutfitID(self):
+        print("> Generating new ID")
+        used = []
+        for outfit in self.all_outfits:
+            used.append(outfit.get_ID())
+        print(f"\t> Used IDs: {used}")
+        while True:
+            new_ID = f"{random.randint(0,9999):04d}"
+            if new_ID not in used:
+                break
+
+        return new_ID
 
     def updateOutfitList(self):
         # UPDATES LOCAL LIST
@@ -503,6 +518,63 @@ class OutfitFrame(tk.Frame):
                         )
                         # make self.all_clothing[] = same cleansiness
 
+    def updateToMatch(self, outfitMatch):
+        print("> Updating cleansiness from own outfit list")
+
+        # updating all other outfits to match this one if same clothing
+        topMatch = outfitMatch.get_top()
+        bottomMatch = outfitMatch.get_bottom()
+        shoesMatch = outfitMatch.get_shoes()
+
+        for k, outfit in enumerate(self.all_outfits):
+            if self.all_outfits[k].get_ID() != outfitMatch.get_ID():
+                print("\t> Not same outfit")
+
+                top = outfit.get_top()
+                bot = outfit.get_bottom()
+                shoes = outfit.get_shoes()
+
+                if topMatch.get_ID() == top.get_ID():
+                    print(
+                        f"\t> {top.get_name()} being matched to {topMatch.get_name()}"
+                    )
+                    print(
+                        f"\t\t> {top.get_name()} from another outfit is turning into {topMatch.is_clean()}"
+                    )
+
+                    self.all_outfits[k].get_top().set_clean(topMatch.is_clean())
+                    # make self.all_clothing[] = same cleansiness
+                else:
+                    print("\t> Top is not the same")
+
+                if bottomMatch.get_ID() == bot.get_ID():
+                    print(
+                        f"\t> {bot.get_name()} being matched to {bottomMatch.get_name()}"
+                    )
+                    print(
+                        f"\t\t> {bot.get_name()} from another outfit is turning into {bottomMatch.is_clean()}"
+                    )
+
+                    self.all_outfits[k].get_bottom().set_clean(bottomMatch.is_clean())
+                    # make self.all_clothing[] = same cleansiness
+                else:
+                    print("\t> Bottom is not the same")
+
+                if shoesMatch.get_ID() == shoes.get_ID():
+                    print(
+                        f"\t> {shoes.get_name()} being matched to {shoesMatch.get_name()}"
+                    )
+                    print(
+                        f"\t\t> {shoes.get_name()} from another outfit is turning into {shoesMatch.is_clean()}"
+                    )
+
+                    self.all_outfits[k].get_shoes().set_clean(shoesMatch.is_clean())
+                    # make self.all_clothing[] = same cleansiness
+                else:
+                    print("\t> Shoes are not the same")
+            else:
+                print("\t> Same outfit")
+
     def updateOutfitAndClothing(self):
         self.updateFromClothing()
         self.updateOutfitList()
@@ -542,6 +614,7 @@ class OutfitFrame(tk.Frame):
         except:
             print("[!] No shoes in outfit.")
 
+        self.updateToMatch(self.all_outfits[outfit_select])
         self.updateOutfitList()
 
     def checkIfRange(self, clothing_lb, lst):
@@ -600,7 +673,7 @@ class ClosetFrame(tk.Frame):
         # REFRESH
         self.refresh_b = tk.Button(
             self.lb_frame,
-            text="Refresh",
+            text="Update from Outfits",
             command=lambda: self.updateClothingAndOutfit(),
         )
 
@@ -1183,7 +1256,7 @@ class ClosetFrame(tk.Frame):
                     self.all_clothing.append(
                         Top(
                             name=self.add_n_var,
-                            ID="0000",
+                            ID=self.genClothingID(),
                             desc=self.add_d_var,
                             type=self.type_var.get(),
                             filepath=self.filepath_add,
@@ -1194,7 +1267,7 @@ class ClosetFrame(tk.Frame):
                     self.all_clothing.append(
                         Bottom(
                             name=self.add_n_var,
-                            ID="0000",
+                            ID=self.genClothingID(),
                             desc=self.add_d_var,
                             type=self.type_var.get(),
                             filepath=self.filepath_add,
@@ -1205,7 +1278,7 @@ class ClosetFrame(tk.Frame):
                     self.all_clothing.append(
                         Shoes(
                             name=self.add_n_var,
-                            ID="0000",
+                            ID=self.genClothingID(),
                             desc=self.add_d_var,
                             type=self.type_var.get(),
                             filepath=self.filepath_add,
@@ -1234,6 +1307,19 @@ class ClosetFrame(tk.Frame):
 
         self.add_window.destroy()
 
+    def genClothingID(self):
+        print("> Generating new ID")
+        used = []
+        for clothing in self.all_clothing:
+            used.append(clothing.get_ID())
+        print(f"\t> Used IDs: {used}")
+        while True:
+            new_ID = f"{random.randint(0,9999):04d}"
+            if new_ID not in used:
+                break
+
+        return new_ID
+
     def updateFromOutfit(self):
         print("> Updating cleansiness from outfit list")
         for outfit in self.user.get_outfits():
@@ -1242,13 +1328,13 @@ class ClosetFrame(tk.Frame):
             shoes = outfit.get_shoes()
 
             print(
-                f"\t> Checking [0] {top.get_name()},ID={top.get_ID()} : {top.is_clean()} from outfit"
+                f"\n> Checking [0] {top.get_name()},ID={top.get_ID()} : {top.is_clean()} from outfit"
             )
             print(
-                f"\t> Checking [1] {bot.get_name()},ID={bot.get_ID()} : {bot.is_clean()} from outfit"
+                f"> Checking [1] {bot.get_name()},ID={bot.get_ID()} : {bot.is_clean()} from outfit"
             )
             print(
-                f"\t> Checking [2] {shoes.get_name()},ID={shoes.get_ID()} : {shoes.is_clean()} from outfit"
+                f"> Checking [2] {shoes.get_name()},ID={shoes.get_ID()} : {shoes.is_clean()} from outfit"
             )
 
             for i, clothing in enumerate(self.all_clothing):
@@ -1263,9 +1349,15 @@ class ClosetFrame(tk.Frame):
                     self.all_clothing[i].set_clean(top.is_clean())
                     # make self.all_clothing[] = same cleansiness
                 elif clothing.get_type() == 1 and bot.get_ID() == clothing.get_ID():
+                    print(
+                        f"\t\t> {self.all_clothing[i].get_name()} is turning into {bot.is_clean()}"
+                    )
                     self.all_clothing[i].set_clean(bot.is_clean())
                     # make self.all_clothing[] = same cleansiness
                 elif clothing.get_type() == 2 and shoes.get_ID() == clothing.get_ID():
+                    print(
+                        f"\t\t> {self.all_clothing[i].get_name()} is turning into {shoes.is_clean()}"
+                    )
                     self.all_clothing[i].set_clean(shoes.is_clean())
                     # make self.all_clothing[] = same cleansiness
 
@@ -1322,7 +1414,7 @@ class ClosetFrame(tk.Frame):
         """
         REFRESH
         """
-        self.refresh_b.grid(row=5, column=0, sticky="NW")
+        self.refresh_b.grid(row=5, column=0, columnspan=2, sticky="NW")
 
     def example_data(self):
         shirt_1 = Top("Blue Shirt", "0000", "Blue shirt I bought at Wendy's")

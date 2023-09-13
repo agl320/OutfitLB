@@ -92,6 +92,7 @@ class Manage:
         for i, outfit in enumerate(d_import["outfits"]):
             self.user_lst[u_name].new_outfit(
                 outfit["name"],
+                outfit["ID"],
                 Top(
                     outfit["top"]["name"],
                     outfit["top"]["ID"],
@@ -135,8 +136,8 @@ class User:
         self.closet_lst = {}
         self.outfit_lst = []
 
-    def new_outfit(self, name, top, bottom, shoes):
-        self.outfit_lst.append(Outfit(name, top, bottom, shoes))
+    def new_outfit(self, name, ID, top, bottom, shoes):
+        self.outfit_lst.append(Outfit(name, ID, top, bottom, shoes))
 
     def new_closet(self, name, ID):
         self.closet_lst[ID] = Closet(name, ID)
@@ -215,8 +216,9 @@ class User:
 
 
 class Outfit:
-    def __init__(self, name, top, bottom, shoes):
+    def __init__(self, name, ID, top, bottom, shoes):
         self.name = name
+        self.ID = ID
         self.top = top
         self.bottom = bottom
         self.shoes = shoes
@@ -250,6 +252,9 @@ class Outfit:
     def get_shoes(self):
         return self.shoes
 
+    def get_ID(self):
+        return self.ID
+
     def isClean(self):
         print(f"OUTFIT CLEAN CHECK: {self.top}, {self.bottom}, {self.shoes}")
         if (
@@ -263,6 +268,8 @@ class Outfit:
 
     def to_dict(self):
         tmp = {"name": self.name}
+
+        tmp_ID = {"ID": self.ID}
 
         try:
             tmp_top = {"top": self.top.to_dict()}
@@ -282,7 +289,7 @@ class Outfit:
             print("ERROR: need shoes")
             tmp_shoes = {"shoes": ""}
 
-        tmp_fin = tmp | tmp_top | tmp_bot | tmp_shoes
+        tmp_fin = tmp | tmp_ID | tmp_top | tmp_bot | tmp_shoes
 
         return tmp_fin
 

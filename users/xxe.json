@@ -11,7 +11,7 @@
                 {
                     "name": "POLO T-shirt",
                     "ID": "0000",
-                    "desc": "White 1967           ",
+                    "desc": "White 1967             ",
                     "colour": "#ffffff",
                     "clean": 1,
                     "type": 0,
@@ -57,6 +57,16 @@
                     "type": 2,
                     "filepath": "",
                     "ckmean": null
+                },
+                {
+                    "name": "Another chicken",
+                    "ID": "6596",
+                    "desc": " ",
+                    "colour": "#ffffff",
+                    "clean": 1,
+                    "type": 1,
+                    "filepath": "",
+                    "ckmean": null
                 }
             ]
         }
@@ -64,6 +74,7 @@
     "outfits": [
         {
             "name": "Outfit-Name",
+            "ID": "0000",
             "top": {
                 "name": "POLO T-shirt",
                 "ID": "0000",
@@ -88,6 +99,74 @@
                 "name": "Adidas UB White",
                 "ID": "0004",
                 "desc": "1.0 ",
+                "colour": "#ffffff",
+                "clean": 1,
+                "type": 2,
+                "filepath": "",
+                "ckmean": null
+            }
+        },
+        {
+            "name": "Stussy",
+            "ID": "0001",
+            "top": {
+                "name": "Stussy Hoodie Gr",
+                "ID": "0002",
+                "desc": "Grey ",
+                "colour": "#ffffff",
+                "clean": 1,
+                "type": 0,
+                "filepath": "",
+                "ckmean": null
+            },
+            "bottom": {
+                "name": "Levi Jeans Bgy",
+                "ID": "0003",
+                "desc": "Baggy    ",
+                "colour": "#ffffff",
+                "clean": 1,
+                "type": 1,
+                "filepath": "",
+                "ckmean": null
+            },
+            "shoes": {
+                "name": "Adidas UB White",
+                "ID": "0004",
+                "desc": "1.0  ",
+                "colour": "#ffffff",
+                "clean": 1,
+                "type": 2,
+                "filepath": "",
+                "ckmean": null
+            }
+        },
+        {
+            "name": "Test",
+            "ID": "5016",
+            "top": {
+                "name": "Stussy Hoodie Bl",
+                "ID": "0001",
+                "desc": "Black ",
+                "colour": "#ffffff",
+                "clean": 1,
+                "type": 0,
+                "filepath": "",
+                "ckmean": null
+            },
+            "bottom": {
+                "name": "Levi Jeans Bgy",
+                "ID": "0003",
+                "desc": "Baggy    ",
+                "colour": "#ffffff",
+                "clean": 1,
+                "type": 1,
+                "filepath": "",
+                "ckmean": null
+            },
+            "shoes": {
+                "name": "Adidas UB White",
+                "ID": "0004",
+                "desc": "1.0  ",
                 "colour": "#ffffff",
                 "clean": 1,
                 "type": 2,
