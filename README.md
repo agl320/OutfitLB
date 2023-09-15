@@ -1,5 +1,6 @@
 # OutfitLB
-Stores and manages outfits and clothing.
+Keeps track of clean and dirty clothing, as well as providing an ability to create outfits.
+
 Run with `py .\main.py`
 
 What I want it to look like:
