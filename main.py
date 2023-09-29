@@ -39,7 +39,7 @@ class MainApplication(tk.Frame):
 
     def optionsPopup(self):
         optionsWindow = tk.Toplevel(self)
-        # self.add_window.geometry("200x200")
+        optionsWindow.geometry("200x200")
         # grab_set() to isolate actions to window
         optionsWindow.grab_set()
 
@@ -52,9 +52,15 @@ class MainApplication(tk.Frame):
             optionsFrame, text="Online", command=lambda: self.onlineOptions()
         )
 
-        optionsFrame.grid(row=0, column=0)
-        localO_button.grid(row=0, column=0)
-        onlineO_button.grid(row=1, column=0)
+        optionsFrame.pack(expand=True)
+
+        localO_button.config(anchor=tk.CENTER)
+        localO_button.pack(expand=True)
+        onlineO_button.config(anchor=tk.CENTER)
+        onlineO_button.pack(expand=True)
+        # optionsFrame.grid(row=0, column=0)
+        # localO_button.grid(row=0, column=0)
+        # onlineO_button.grid(row=1, column=0)
 
     # retrieves logged in data and displays it for user to download locally
     def getLoggedInData(self):
@@ -87,14 +93,15 @@ class MainApplication(tk.Frame):
             }
 
             self.DBMaster.insert(dbExport)
+            self.onlineOWindow.destroy()
 
     def signup(self):
-        onlineOWindow = tk.Toplevel(self)
+        self.onlineOWindow = tk.Toplevel(self)
         # self.add_window.geometry("200x200")
         # grab_set() to isolate actions to window
-        onlineOWindow.grab_set()
+        self.onlineOWindow.grab_set()
 
-        onlineOFrame = tk.Frame(onlineOWindow)
+        onlineOFrame = tk.Frame(self.onlineOWindow)
         # username, password, password again
 
         # Username widgets
@@ -210,7 +217,7 @@ class MainApplication(tk.Frame):
 
     def onlineOptions(self):
         onlineOWindow = tk.Toplevel(self)
-        # self.add_window.geometry("200x200")
+        onlineOWindow.geometry("200x200")
         # grab_set() to isolate actions to window
         onlineOWindow.grab_set()
 
@@ -225,9 +232,12 @@ class MainApplication(tk.Frame):
             login_button = tk.Button(
                 onlineOFrame, text="Login", command=lambda: self.login()
             )
-            onlineOFrame.grid(row=0, column=0)
-            signup_button.grid(row=0, column=0)
-            login_button.grid(row=1, column=0)
+            onlineOFrame.pack(expand=True)
+            signup_button.pack(expand=True)
+            login_button.pack(expand=True)
+            # onlineOFrame.grid(row=0, column=0)
+            # signup_button.grid(row=0, column=0)
+            # login_button.grid(row=1, column=0)
         else:
             # Run getLoggedInData()
             # display all user configs saved on the database
@@ -236,7 +246,7 @@ class MainApplication(tk.Frame):
 
     def localOptions(self):
         localOWindow = tk.Toplevel(self)
-        # self.add_window.geometry("200x200")
+        localOWindow.geometry("200x200")
         # grab_set() to isolate actions to window
         localOWindow.grab_set()
 
@@ -249,9 +259,12 @@ class MainApplication(tk.Frame):
             localOFrame, text="New user", command=lambda: self.newAccountPopup()
         )
 
-        localOFrame.grid(row=0, column=0)
-        import_button.grid(row=0, column=0)
-        new_button.grid(row=1, column=0)
+        localOFrame.pack(expand=True)
+        import_button.pack(expand=True)
+        new_button.pack(expand=True)
+        # localOFrame.grid(row=0, column=0)
+        # import_button.grid(row=0, column=0)
+        # new_button.grid(row=1, column=0)
 
     def newAccountPopup(self):
         self.newWindow = tk.Toplevel(self)
@@ -352,7 +365,7 @@ class MainApplication(tk.Frame):
         self.cframe = ClosetFrame(self.actionframe, self.user)
         self.oframe = OutfitFrame(self.actionframe, self.user)
 
-        self.parent.geometry("650x500")
+        # self.parent.geometry("650x500")
         self.parent.title("Outfit Manager")
 
         # frame storing and management
