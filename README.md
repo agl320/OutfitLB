@@ -13,4 +13,5 @@ What I want it to look like:
 ![OutfitLB-final-GH](https://github.com/xegativ/OutfitLB/assets/52055203/718d6669-9d05-43e6-a313-feb4ab584d32)
 
 What it unfortunately looks like:
+
 ![Screenshot 2023-09-28 201756](https://github.com/xegativ/OutfitLB/assets/52055203/8e9f2ef5-8f03-441a-96d9-dbc09a91b944)
