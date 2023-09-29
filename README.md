@@ -2,7 +2,7 @@
 Keeps track of clean and dirty clothing, as well as providing an ability to create outfits.
 
 Features:
-- Accounts (database) > User profiles > Closets, Clothing, and Outfits
+- Hierarchy: Accounts (database) > User profiles > Closets, Clothing, and Outfits
 - Stores Clothing (Top, Bottom, Shoes) in Closets
 - Clothing can be grouped up together to create Outfits
 - Both Clothing and Outfits interact when one becomes dirty/clean
