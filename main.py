@@ -11,11 +11,19 @@ from ckmean import *
 
 from tkinter import filedialog
 
+import hashlib
+
+from components.DBSetup import DBSetup
+
 
 class MainApplication(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         # not using super because tkinter uses old way
         tk.Frame.__init__(self, parent, *args, **kwargs)
+
+        # Database init
+        self.DBMaster = DBSetup()
+
         self.parent = parent
 
         # # ACCOUNT
@@ -36,16 +44,213 @@ class MainApplication(tk.Frame):
         optionsWindow.grab_set()
 
         optionsFrame = tk.Frame(optionsWindow)
-        switch_button = tk.Button(
-            optionsFrame, text="Switch", command=lambda: self.switchAccount()
+        localO_button = tk.Button(
+            optionsFrame, text="Local", command=lambda: self.localOptions()
         )
 
+        onlineO_button = tk.Button(
+            optionsFrame, text="Online", command=lambda: self.onlineOptions()
+        )
+
+        optionsFrame.grid(row=0, column=0)
+        localO_button.grid(row=0, column=0)
+        onlineO_button.grid(row=1, column=0)
+
+    # retrieves logged in data and displays it for user to download locally
+    def getLoggedInData(self):
+        pass
+
+    def signupSubmit(self, username, password):
+        # define hashing style and hash password
+
+        # check if username exists
+        if (
+            self.DBMaster.getCollection().count_documents(
+                {"account": username}, limit=1
+            )
+            != 0
+        ):
+            print("> Username already exists")
+            tk.messagebox.showerror(message="Username already exists")
+        else:
+            h = hashlib.new("SHA256")
+            h.update(password.encode())
+
+            print(f"> Trying to sign up with {username} and {h.hexdigest()}")
+
+            # send to mongodb database
+            # data is list of users
+            dbExport = {
+                "account": username,
+                "password": h.hexdigest(),
+                "data": [],
+            }
+
+            self.DBMaster.insert(dbExport)
+
+    def signup(self):
+        onlineOWindow = tk.Toplevel(self)
+        # self.add_window.geometry("200x200")
+        # grab_set() to isolate actions to window
+        onlineOWindow.grab_set()
+
+        onlineOFrame = tk.Frame(onlineOWindow)
+        # username, password, password again
+
+        # Username widgets
+        usernameLabel = tk.Label(onlineOFrame, text="Username", justify=tk.LEFT)
+        usernameEntry = tk.Entry(onlineOFrame, width=20)
+
+        # Password widgets
+        passwordLabel = tk.Label(onlineOFrame, text="Password", justify=tk.LEFT)
+        passwordEntry = tk.Entry(onlineOFrame, width=20)
+
+        passwordRLabel = tk.Label(onlineOFrame, text="Retype Password", justify=tk.LEFT)
+        passwordREntry = tk.Entry(onlineOFrame, width=20)
+
+        # Submit button
+        # goes to function that pushes data to database
+        # {accountusername: ... ,
+        # accountpassword: ...(hashed) ,
+        # accountdata: ...(users)}
+        submitButton = tk.Button(
+            onlineOFrame,
+            text="Submit",
+            command=lambda: self.signupSubmit(usernameEntry.get(), passwordEntry.get()),
+        )
+
+        # hash password, upload to database paired with username
+        usernameLabel.grid(row=0, column=0)
+        usernameEntry.grid(row=1, column=0)
+
+        passwordLabel.grid(row=2, column=0)
+        passwordEntry.grid(row=3, column=0)
+        passwordRLabel.grid(row=4, column=0)
+        passwordREntry.grid(row=5, column=0)
+
+        submitButton.grid(row=6, column=0)
+
+        onlineOFrame.grid(row=0, column=0)
+
+    def loginSubmit(self, username, password):
+        # define hashing style and hash password
+        h = hashlib.new("SHA256")
+        h.update(password.encode())
+
+        print(f"> Trying to login with {username} and {h.hexdigest()}")
+
+        exampleAcc = {
+            "account": "agl13",
+            "password": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+            "data": [],
+        }
+
+        # find returns Cursor instance which allows you to iterate over all matching documents
+        # find_one finds first instance
+        account = self.DBMaster.getCollection().find_one({"account": username})
+
+        if account is None:
+            print("Account not found.")
+            tk.messagebox.showerror(message="Account not found.")
+        else:
+            print(account["password"])
+            print("\t> Found account, checking password")
+            # check password
+            if exampleAcc["password"] == h.hexdigest():
+                tk.messagebox.showinfo(message="Log in successful!")
+                print("\t> Password match, logged in")
+                self.loginWindow.destroy()
+            else:
+                tk.messagebox.showerror(message="Incorrect password")
+                print("\t> Incorrect password")
+
+    def login(self):
+        # get hashed password from database and check with hashed password from user
+        # if matches, loggedin is true
+        # two options: upload data button, import data to listbox to import
+        # run getLoggedInData()
+
+        self.loginWindow = tk.Toplevel(self)
+        # self.add_window.geometry("200x200")
+        # grab_set() to isolate actions to window
+        self.loginWindow.grab_set()
+
+        loginFrame = tk.Frame(self.loginWindow)
+        # username, password, password again
+
+        # Username widgets
+        usernameLabel = tk.Label(loginFrame, text="Username", justify=tk.LEFT)
+        usernameEntry = tk.Entry(loginFrame, width=20)
+
+        # Password widgets
+        passwordLabel = tk.Label(loginFrame, text="Password", justify=tk.LEFT)
+        passwordEntry = tk.Entry(loginFrame, width=20)
+
+        # Submit button
+        # goes to function that pushes data to database
+        # {accountusername: ... ,
+        # accountpassword: ...(hashed) ,
+        # accountdata: ...(users)}
+        submitButton = tk.Button(
+            loginFrame,
+            text="Submit",
+            command=lambda: self.loginSubmit(usernameEntry.get(), passwordEntry.get()),
+        )
+
+        # hash password, upload to database paired with username
+        usernameLabel.grid(row=0, column=0)
+        usernameEntry.grid(row=1, column=0)
+
+        passwordLabel.grid(row=2, column=0)
+        passwordEntry.grid(row=3, column=0)
+
+        submitButton.grid(row=6, column=0)
+
+        loginFrame.grid(row=0, column=0)
+
+    def onlineOptions(self):
+        onlineOWindow = tk.Toplevel(self)
+        # self.add_window.geometry("200x200")
+        # grab_set() to isolate actions to window
+        onlineOWindow.grab_set()
+
+        onlineOFrame = tk.Frame(onlineOWindow)
+
+        # checked if already logged in or not
+        # if not, allow for signup/login
+        if True:
+            signup_button = tk.Button(
+                onlineOFrame, text="Sign Up", command=lambda: self.signup()
+            )
+            login_button = tk.Button(
+                onlineOFrame, text="Login", command=lambda: self.login()
+            )
+            onlineOFrame.grid(row=0, column=0)
+            signup_button.grid(row=0, column=0)
+            login_button.grid(row=1, column=0)
+        else:
+            # Run getLoggedInData()
+            # display all user configs saved on the database
+            # allow user to select which config they want
+            pass
+
+    def localOptions(self):
+        localOWindow = tk.Toplevel(self)
+        # self.add_window.geometry("200x200")
+        # grab_set() to isolate actions to window
+        localOWindow.grab_set()
+
+        localOFrame = tk.Frame(localOWindow)
+
+        import_button = tk.Button(
+            localOFrame, text="Import", command=lambda: self.switchAccount()
+        )
         new_button = tk.Button(
-            optionsFrame, text="New", command=lambda: self.newAccountPopup()
+            localOFrame, text="New user", command=lambda: self.newAccountPopup()
         )
 
-        optionsFrame.grid(row=0, column=0, sticky="NW")
-        switch_button.grid(row=0, column=0)
+        localOFrame.grid(row=0, column=0)
+        import_button.grid(row=0, column=0)
         new_button.grid(row=1, column=0)
 
     def newAccountPopup(self):
@@ -54,6 +259,7 @@ class MainApplication(tk.Frame):
         # grab_set() to isolate actions to window
         self.newWindow.grab_set()
 
+        # WIDGET RENDERING
         newWindowFrame = tk.Frame(self.newWindow)
 
         firstNameVar = tk.StringVar()
@@ -94,10 +300,12 @@ class MainApplication(tk.Frame):
         createButton.grid(row=6, column=0)
         cancelButton.grid(row=6, column=1)
 
+    # Create User and Close window
     def createAndClose(self, firstNameVar, lastNameVar, usernameVar, loggedIn=0):
         self.createAccount(firstNameVar, lastNameVar, usernameVar, loggedIn)
         self.newWindow.destroy()
 
+    # Create New User function
     def createAccount(self, firstNameVar, lastNameVar, usernameVar, loggedIn=0):
         d_import = {
             "firstName": firstNameVar,
@@ -119,13 +327,19 @@ class MainApplication(tk.Frame):
         self.topframe = tk.Frame(self)
 
         account_button = tk.Button(
-            self.topframe, text="Account", command=lambda: self.optionsPopup()
+            self.topframe,
+            text="Account",
+            command=lambda: self.optionsPopup(),
+            bg="#c4dbff",
+            fg="black",
+            font="Helvetica 9 bold",
         )
         account_button.grid(row=0, column=0)
 
         save_button = tk.Button(
             self.topframe,
             text="Save",
+            bg="#c4dbff",
             command=lambda: self.user.export_json(self.filepath),
         )
         save_button.grid(row=0, column=1)
@@ -305,35 +519,38 @@ class MainApplication(tk.Frame):
         # uploading file
         users_add = os.path.join(os.getcwd(), "users")
 
-        self.filepath = filedialog.askopenfilename(
-            initialdir=users_add,
-            filetypes=(("JSON files", "*.json"), ("All files", "*.*")),
-        )
+        try:
+            self.filepath = filedialog.askopenfilename(
+                initialdir=users_add,
+                filetypes=(("JSON files", "*.json"), ("All files", "*.*")),
+            )
 
-        # if self.filepath:
-        #     filename = os.path.basename(self.filepath)
+            # if self.filepath:
+            #     filename = os.path.basename(self.filepath)
 
-        # LOG OUT USING OLD FILE_NAME
-        print(f"+++ {self.old_filepath} IS LOGGED OUT +++")
-        self.Manager.userLogOut(self.old_filepath)
+            # LOG OUT USING OLD FILE_NAME
+            print(f"+++ {self.old_filepath} IS LOGGED OUT +++")
+            self.Manager.userLogOut(self.old_filepath)
 
-        with open(self.filepath, "r") as read_file:
-            d_import = json.load(read_file)
+            with open(self.filepath, "r") as read_file:
+                d_import = json.load(read_file)
 
-            u_name = d_import["userName"]
-            # self.Manager.import_from_file(f"{os.path.splitext(filename)[0]}")
-            self.Manager.import_from_file(self.filepath)
-            self.user = self.Manager.return_user(u_name)
+                u_name = d_import["userName"]
+                # self.Manager.import_from_file(f"{os.path.splitext(filename)[0]}")
+                self.Manager.import_from_file(self.filepath)
+                self.user = self.Manager.return_user(u_name)
 
-        # Change LoggedIn status
-        d_import["loggedIn"] = 1
-        with open(self.filepath, "w") as update_file:
-            json.dump(d_import, update_file, indent=4)
-            update_file.close()
+            # Change LoggedIn status
+            d_import["loggedIn"] = 1
+            with open(self.filepath, "w") as update_file:
+                json.dump(d_import, update_file, indent=4)
+                update_file.close()
 
-        print(f"+++ {u_name} IS LOGGED IN +++")
+            print(f"+++ {u_name} IS LOGGED IN +++")
 
-        self.refreshWidget()
+            self.refreshWidget()
+        except:
+            print("> User import cancelled")
 
 
 def main():

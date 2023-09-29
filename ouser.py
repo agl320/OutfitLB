@@ -183,11 +183,11 @@ class User:
 
     def save_closet(self, closet_new, ID):
         self.closet_lst[ID].set_closet(closet_new)
-        print(f"UPDATED CLOSET [{ID}]: {self.closet_lst}")
+        print(f"[!] UPDATED CLOSET [{ID}]: {self.closet_lst}")
 
     def save_outfits(self, outfits_new):
         self.outfit_lst = outfits_new
-        print(f"UPDATED OUTFITS: {self.outfit_lst}")
+        print(f"[!] UPDATED OUTFIT LIST: {self.outfit_lst}")
 
     def export_json(self, filepath):
         print("[!] EXPORTING [!]")
@@ -256,7 +256,7 @@ class Outfit:
         return self.ID
 
     def isClean(self):
-        print(f"OUTFIT CLEAN CHECK: {self.top}, {self.bottom}, {self.shoes}")
+        print(f"[~] OUTFIT CLEAN CHECK: {self.top}, {self.bottom}, {self.shoes}")
         if (
             (self.top == None or self.top.is_clean())
             and (self.bottom == None or self.bottom.is_clean())
@@ -274,19 +274,19 @@ class Outfit:
         try:
             tmp_top = {"top": self.top.to_dict()}
         except:
-            print("ERROR: need top")
+            print("[!] ERROR: need top")
             tmp_top = {"top": ""}
 
         try:
             tmp_bot = {"bottom": self.bottom.to_dict()}
         except:
-            print("ERROR: need bottom")
+            print("[!] ERROR: need bottom")
             tmp_bot = {"bottom": ""}
 
         try:
             tmp_shoes = {"shoes": self.shoes.to_dict()}
         except:
-            print("ERROR: need shoes")
+            print("[!] ERROR: need shoes")
             tmp_shoes = {"shoes": ""}
 
         tmp_fin = tmp | tmp_ID | tmp_top | tmp_bot | tmp_shoes

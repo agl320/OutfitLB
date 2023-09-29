@@ -58,6 +58,7 @@ class ClosetFrame(tk.Frame):
         self.refresh_b = tk.Button(
             self.lb_frame,
             text="Update from Outfits",
+            bg="#c4dbff",
             command=lambda: self.updateClothingAndOutfit(),
         )
 
@@ -500,12 +501,13 @@ class ClosetFrame(tk.Frame):
 
     def updateClothingList(self):
         self.clothing_lb.delete(0, tk.END)
+        print("> Importing closet contents...")
         for i, clothing in enumerate(self.all_clothing):
             self.clothing_lb.insert(i, clothing.get_name())
 
             # debug print
             print(
-                f"[+ type:{clothing.get_type()}] {clothing.get_name()}\n\t{clothing.get_desc()}\n\t{clothing.is_clean()}"
+                f"\t> type:{clothing.get_type()}, {clothing.get_name()}, {clothing.get_desc()}, {clothing.is_clean()}"
             )
 
             if clothing.is_clean():
@@ -631,7 +633,7 @@ class ClosetFrame(tk.Frame):
 
             # debug print
             print(
-                f"[+ NEW]\n\tNAME: {self.add_n_var}\n\tDESC: {self.add_d_var}\n\tCLEAN: {self.clean_var.get()}\n\tTYPE: {self.type_var.get()}"
+                f"> Adding new clothing: \n\tNAME: {self.add_n_var}\n\tDESC: {self.add_d_var}\n\tCLEAN: {self.clean_var.get()}\n\tTYPE: {self.type_var.get()}"
             )
 
             # Adding to clothing list -> type check

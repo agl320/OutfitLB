@@ -58,6 +58,7 @@ class OutfitFrame(tk.Frame):
         self.findCleanO_b = tk.Button(
             self.o_option_fr,
             text="Update from Closet",
+            bg="#c4dbff",
             command=lambda: self.updateOutfitAndClothing(),
         )
 
