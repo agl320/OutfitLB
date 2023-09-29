@@ -5,7 +5,7 @@ Features:
 - Store Clothing (Top, Bottom, Shoes) in Closets
 - Clothing can be grouped up together to create Outfits
 - Both Clothing and Outfits interact when one becomes dirty/clean
-- Local and online storage for User configs
+- Local and online storage for User configs with hashing authentication
 
 Run with `py .\main.py`
 
@@ -13,4 +13,4 @@ What I want it to look like:
 ![OutfitLB-final-GH](https://github.com/xegativ/OutfitLB/assets/52055203/718d6669-9d05-43e6-a313-feb4ab584d32)
 
 What it unfortunately looks like:
-![image](https://github.com/xegativ/OutfitLB/assets/52055203/11b1e543-fb5d-4ea6-9d31-a052a52899b9)
+![Screenshot 2023-09-28 201756](https://github.com/xegativ/OutfitLB/assets/52055203/8e9f2ef5-8f03-441a-96d9-dbc09a91b944)
