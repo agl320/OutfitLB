@@ -1,6 +1,12 @@
 # OutfitLB
 Keeps track of clean and dirty clothing, as well as providing an ability to create outfits.
 
+Features:
+- Store Clothing (Top, Bottom, Shoes) in Closets
+- Clothing can be grouped up together to create Outfits
+- Both Clothing and Outfits interact when one becomes dirty/clean
+- Local and online storage for User configs
+
 Run with `py .\main.py`
 
 What I want it to look like:
