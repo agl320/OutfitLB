@@ -27,3 +27,6 @@ class DBSetup:
     # uploading data back to database
     def insert(self, data):
         self.collection.insert_one(data)
+
+    def quit(self):
+        self.client.close()

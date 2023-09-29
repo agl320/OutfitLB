@@ -146,11 +146,11 @@ class MainApplication(tk.Frame):
 
         print(f"> Trying to login with {username} and {h.hexdigest()}")
 
-        exampleAcc = {
-            "account": "agl13",
-            "password": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
-            "data": [],
-        }
+        # exampleAcc = {
+        #     "account": "agl13",
+        #     "password": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+        #     "data": [],
+        # }
 
         # find returns Cursor instance which allows you to iterate over all matching documents
         # find_one finds first instance
@@ -163,7 +163,7 @@ class MainApplication(tk.Frame):
             print(account["password"])
             print("\t> Found account, checking password")
             # check password
-            if exampleAcc["password"] == h.hexdigest():
+            if account["password"] == h.hexdigest():
                 tk.messagebox.showinfo(message="Log in successful!")
                 print("\t> Password match, logged in")
                 self.loginWindow.destroy()
@@ -335,6 +335,10 @@ class MainApplication(tk.Frame):
         with open(finalpath, "w") as json_file:
             json.dump(d_import, json_file, indent=4)
 
+    def QUIT(self):
+        self.DBMaster.quit()
+        self.parent.destroy()
+
     def initialWidgetDisplay(self):
         # TOP FRAME
         self.topframe = tk.Frame(self)
@@ -356,6 +360,15 @@ class MainApplication(tk.Frame):
             command=lambda: self.user.export_json(self.filepath),
         )
         save_button.grid(row=0, column=1)
+
+        quit_button = tk.Button(
+            self.topframe,
+            text="Quit",
+            command=lambda: self.QUIT(),
+            bg="#c4dbff",
+            fg="black",
+        )
+        quit_button.grid(row=0, column=3)
 
         # left option, right action
         self.optionframe = tk.Frame(self)
@@ -382,9 +395,9 @@ class MainApplication(tk.Frame):
         self.oframe.grid(row=0, column=0, sticky="news")
 
         # MAIN
-        self.topframe.grid(row=0, column=0, sticky="news")
+        self.topframe.grid(row=0, column=0, columnspan=10, sticky="news")
         self.optionframe.grid(row=1, column=0, sticky="nw")
-        self.actionframe.grid(row=1, column=1, sticky="nw")
+        self.actionframe.grid(row=1, column=1, sticky="nw", padx=(5, 5), pady=(5, 5))
         self.actionframe.rowconfigure(0, weight=1)
         self.actionframe.columnconfigure(0, weight=1)
 
