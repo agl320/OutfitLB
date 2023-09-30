@@ -15,6 +15,8 @@ import hashlib
 
 from components.DBSetup import DBSetup
 
+import json
+
 
 class MainApplication(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -25,6 +27,18 @@ class MainApplication(tk.Frame):
         self.DBMaster = DBSetup()
 
         self.parent = parent
+
+        # empty string if not logged in
+        # string will be username
+        # accesss data via
+        # account = self.DBMaster.getCollection().find_one({"account": username})
+        # account["data"]
+
+        # generate token, store token in database
+        # everytime you try to access database, check token is valid
+        # self.loginAccount = ""
+        self.authenU = ""
+        self.authenPW = ""
 
         # # ACCOUNT
         # agl13 = User("GH", "Andrew", "agl13")
@@ -37,13 +51,109 @@ class MainApplication(tk.Frame):
 
         self.initialWidgetDisplay()
 
-    def optionsPopup(self):
-        optionsWindow = tk.Toplevel(self)
-        optionsWindow.geometry("200x200")
-        # grab_set() to isolate actions to window
-        optionsWindow.grab_set()
+    def logout(self):
+        # clear cached data
+        self.authenU = ""
+        self.authenPW = ""
+        self.accountWindow.destroy()
 
-        optionsFrame = tk.Frame(optionsWindow)
+    def uploadUser(self):
+        users_add = os.path.join(os.getcwd(), "users")
+        # try:
+        self.filepath = filedialog.askopenfilename(
+            initialdir=users_add,
+            filetypes=(("JSON files", "*.json"), ("All files", "*.*")),
+        )
+
+        # upload file and ensure it is logged out before uploading
+        with open(self.filepath, "r") as read_file:
+            d_import = json.load(read_file)
+            d_import["loggedIn"] = 0
+
+        self.DBMaster.update(self.authenU, d_import)
+        print(f"[>>>] UPLOADED {d_import['userName']} TO DATABASE")
+
+        self.accountWindow.destroy()
+
+        # except:
+        #     print("> User upload cancelled")
+
+    # retrieves logged in data and displays it for user to download locally
+    def getLoggedInData(self):
+        self.accountWindow = tk.Toplevel(self)
+        # self.add_window.geometry("200x200")
+        # grab_set() to isolate actions to window
+        self.accountWindow.grab_set()
+
+        accountFrame = tk.Frame(self.accountWindow)
+        navFrame = tk.Frame(self.accountWindow)
+
+        # account name label:
+        # import user to database:
+        # list box of database values:
+
+        h = hashlib.new("SHA256")
+        h.update(self.authenPW.encode())
+
+        acc = self.DBMaster.getCollection().find_one(
+            {"account": self.authenU, "password": h.hexdigest()}
+        )
+
+        accountName_label = tk.Label(
+            navFrame,
+            text=f"Account name: {self.DBMaster.getCollection().find_one({'account' : self.authenU})['account']} // {self.authenU}",
+        )
+
+        accountUpload_b = tk.Button(
+            navFrame,
+            text="Upload to database",
+            command=lambda: self.uploadUser(),
+        )
+
+        accountLogOut_b = tk.Button(
+            navFrame, text="Log Out", command=lambda: self.logout()
+        )
+
+        if acc:
+            account_data = acc["data"]
+            print(f"[!!!] ACCOUNT DATA: {account_data}")
+        else:
+            print("[!] No account error")
+
+        navFrame.grid(row=0, column=0)
+        accountName_label.grid(row=0, column=0)
+        accountUpload_b.grid(row=1, column=0)
+        accountLogOut_b.grid(row=1, column=1)
+
+        for i, userprofile in enumerate(acc["data"]):
+            tk.Label(
+                accountFrame,
+                text=f"Account: {acc['data'][i]['userName']}",
+            ).grid(row=i, column=0)
+
+            tk.Button(accountFrame, text="Download").grid(row=i, column=1)
+            # tk.Button(accountFrame, text="Delete").grid(row=i, column=2, command=lambda: acc['data'])
+
+        accountFrame.grid(row=1, column=0)
+
+    def onlineOptions(self):
+        # if logged in
+        if len(self.authenPW) == 0 and len(self.authenU) == 0:
+            #     # online options window with sign up and login
+            print("[>] Not logged in")
+            self.onlineOptionsLO()
+        else:
+            print("[>] Logged in")
+            self.getLoggedInData()
+
+    def optionsPopup(self):
+        print("[>] Opened options")
+        self.optionsWindow = tk.Toplevel(self)
+        self.optionsWindow.geometry("200x200")
+        # grab_set() to isolate actions to window
+        self.optionsWindow.grab_set()
+
+        optionsFrame = tk.Frame(self.optionsWindow)
         localO_button = tk.Button(
             optionsFrame, text="Local", command=lambda: self.localOptions()
         )
@@ -61,10 +171,6 @@ class MainApplication(tk.Frame):
         # optionsFrame.grid(row=0, column=0)
         # localO_button.grid(row=0, column=0)
         # onlineO_button.grid(row=1, column=0)
-
-    # retrieves logged in data and displays it for user to download locally
-    def getLoggedInData(self):
-        pass
 
     def signupSubmit(self, username, password):
         # define hashing style and hash password
@@ -164,9 +270,19 @@ class MainApplication(tk.Frame):
             print("\t> Found account, checking password")
             # check password
             if account["password"] == h.hexdigest():
-                tk.messagebox.showinfo(message="Log in successful!")
+                tk.messagebox.showinfo(message="Login successful!")
                 print("\t> Password match, logged in")
+
+                # # remove this later
+                # self.loginAccount = username
+                self.authenU = username
+                self.authenPW = password
+
+                # temporary way of logging in (must fix in future)
+
                 self.loginWindow.destroy()
+                self.onlineOWindow.destroy()
+                self.optionsWindow.destroy()
             else:
                 tk.messagebox.showerror(message="Incorrect password")
                 print("\t> Incorrect password")
@@ -215,34 +331,29 @@ class MainApplication(tk.Frame):
 
         loginFrame.grid(row=0, column=0)
 
-    def onlineOptions(self):
-        onlineOWindow = tk.Toplevel(self)
-        onlineOWindow.geometry("200x200")
+    def onlineOptionsLO(self):
+        self.onlineOWindow = tk.Toplevel(self)
+        self.onlineOWindow.geometry("200x200")
         # grab_set() to isolate actions to window
-        onlineOWindow.grab_set()
+        self.onlineOWindow.grab_set()
 
-        onlineOFrame = tk.Frame(onlineOWindow)
+        onlineOFrame = tk.Frame(self.onlineOWindow)
 
         # checked if already logged in or not
         # if not, allow for signup/login
-        if True:
-            signup_button = tk.Button(
-                onlineOFrame, text="Sign Up", command=lambda: self.signup()
-            )
-            login_button = tk.Button(
-                onlineOFrame, text="Login", command=lambda: self.login()
-            )
-            onlineOFrame.pack(expand=True)
-            signup_button.pack(expand=True)
-            login_button.pack(expand=True)
-            # onlineOFrame.grid(row=0, column=0)
-            # signup_button.grid(row=0, column=0)
-            # login_button.grid(row=1, column=0)
-        else:
-            # Run getLoggedInData()
-            # display all user configs saved on the database
-            # allow user to select which config they want
-            pass
+
+        signup_button = tk.Button(
+            onlineOFrame, text="Sign Up", command=lambda: self.signup()
+        )
+        login_button = tk.Button(
+            onlineOFrame, text="Login", command=lambda: self.login()
+        )
+        onlineOFrame.pack(expand=True)
+        signup_button.pack(expand=True)
+        login_button.pack(expand=True)
+        # onlineOFrame.grid(row=0, column=0)
+        # signup_button.grid(row=0, column=0)
+        # login_button.grid(row=1, column=0)
 
     def localOptions(self):
         localOWindow = tk.Toplevel(self)
@@ -253,10 +364,10 @@ class MainApplication(tk.Frame):
         localOFrame = tk.Frame(localOWindow)
 
         import_button = tk.Button(
-            localOFrame, text="Import", command=lambda: self.switchAccount()
+            localOFrame, text="Import", command=lambda: self.switchUser()
         )
         new_button = tk.Button(
-            localOFrame, text="New user", command=lambda: self.newAccountPopup()
+            localOFrame, text="New user", command=lambda: self.newUserPopup()
         )
 
         localOFrame.pack(expand=True)
@@ -266,7 +377,7 @@ class MainApplication(tk.Frame):
         # import_button.grid(row=0, column=0)
         # new_button.grid(row=1, column=0)
 
-    def newAccountPopup(self):
+    def newUserPopup(self):
         self.newWindow = tk.Toplevel(self)
         # self.add_window.geometry("200x200")
         # grab_set() to isolate actions to window
@@ -315,11 +426,11 @@ class MainApplication(tk.Frame):
 
     # Create User and Close window
     def createAndClose(self, firstNameVar, lastNameVar, usernameVar, loggedIn=0):
-        self.createAccount(firstNameVar, lastNameVar, usernameVar, loggedIn)
+        self.createUser(firstNameVar, lastNameVar, usernameVar, loggedIn)
         self.newWindow.destroy()
 
     # Create New User function
-    def createAccount(self, firstNameVar, lastNameVar, usernameVar, loggedIn=0):
+    def createUser(self, firstNameVar, lastNameVar, usernameVar, loggedIn=0):
         d_import = {
             "firstName": firstNameVar,
             "lastName": lastNameVar,
@@ -463,7 +574,7 @@ class MainApplication(tk.Frame):
         # if none, create one that is logged in
         if len(json_files) == 0:
             print("\t> No users in folder")
-            self.createAccount("First name", "Last name", "username", 1)
+            self.createUser("First name", "Last name", "username", 1)
         else:
             print("\t> Users exist in folder")
 
@@ -536,7 +647,7 @@ class MainApplication(tk.Frame):
         print(json_files)
         print(f"> Old filepath (LOGGED IN): {self.old_filepath}")
 
-    def switchAccount(self):
+    def switchUser(self):
         print("> Switching account initiated!")
         print(f"\t> Old filepath: {self.old_filepath}")
         # GET OLD FILE_NAME
