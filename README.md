@@ -6,7 +6,8 @@ Features:
 - Stores Clothing (Top, Bottom, Shoes) in Closets
 - Clothing can be grouped up together to create Outfits
 - Both Clothing and Outfits interact when one becomes dirty/clean
-- Local and online storage for User configs with hashing authentication
+- Local and online storage for User configs with hashing authentication (WIP)
+- Changing to CustomTkinter for more modern UI (WIP)
 
 Run with `py .\main.py`
 
