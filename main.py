@@ -1,5 +1,6 @@
 import os
-import tkinter as tk
+import customtkinter as tk
+from CTkListbox import *
 
 from components.SwitchFrame import SwitchFrame
 from components.OutfitFrame import OutfitFrame
@@ -18,10 +19,10 @@ from components.DBSetup import DBSetup
 import json
 
 
-class MainApplication(tk.Frame):
+class MainApplication(tk.CTkFrame):
     def __init__(self, parent, *args, **kwargs):
         # not using super because tkinter uses old way
-        tk.Frame.__init__(self, parent, *args, **kwargs)
+        tk.CTkFrame.__init__(self, parent, *args, **kwargs)
 
         # Database init
         self.DBMaster = DBSetup()
@@ -80,13 +81,13 @@ class MainApplication(tk.Frame):
 
     # retrieves logged in data and displays it for user to download locally
     def getLoggedInData(self):
-        self.accountWindow = tk.Toplevel(self)
+        self.accountWindow = tk.CTkToplevel(self)
         # self.add_window.geometry("200x200")
         # grab_set() to isolate actions to window
         self.accountWindow.grab_set()
 
-        accountFrame = tk.Frame(self.accountWindow)
-        navFrame = tk.Frame(self.accountWindow)
+        accountFrame = tk.CTkFrame(self.accountWindow)
+        navFrame = tk.CTkFrame(self.accountWindow)
 
         # account name label:
         # import user to database:
@@ -99,18 +100,18 @@ class MainApplication(tk.Frame):
             {"account": self.authenU, "password": h.hexdigest()}
         )
 
-        accountName_label = tk.Label(
+        accountName_label = tk.CTkLabel(
             navFrame,
             text=f"Account name: {self.DBMaster.getCollection().find_one({'account' : self.authenU})['account']} // {self.authenU}",
         )
 
-        accountUpload_b = tk.Button(
+        accountUpload_b = tk.CTkButton(
             navFrame,
             text="Upload to database",
             command=lambda: self.uploadUser(),
         )
 
-        accountLogOut_b = tk.Button(
+        accountLogOut_b = tk.CTkButton(
             navFrame, text="Log Out", command=lambda: self.logout()
         )
 
@@ -126,13 +127,13 @@ class MainApplication(tk.Frame):
         accountLogOut_b.grid(row=1, column=1)
 
         for i, userprofile in enumerate(acc["data"]):
-            tk.Label(
+            tk.CTkLabel(
                 accountFrame,
                 text=f"Account: {acc['data'][i]['userName']}",
             ).grid(row=i, column=0)
 
-            tk.Button(accountFrame, text="Download").grid(row=i, column=1)
-            # tk.Button(accountFrame, text="Delete").grid(row=i, column=2, command=lambda: acc['data'])
+            tk.CTkButton(accountFrame, text="Download").grid(row=i, column=1)
+            # tk.CTkButton(accountFrame, text="Delete").grid(row=i, column=2, command=lambda: acc['data'])
 
         accountFrame.grid(row=1, column=0)
 
@@ -148,25 +149,25 @@ class MainApplication(tk.Frame):
 
     def optionsPopup(self):
         print("[>] Opened options")
-        self.optionsWindow = tk.Toplevel(self)
+        self.optionsWindow = tk.CTkToplevel(self)
         self.optionsWindow.geometry("200x200")
         # grab_set() to isolate actions to window
         self.optionsWindow.grab_set()
 
-        optionsFrame = tk.Frame(self.optionsWindow)
-        localO_button = tk.Button(
+        optionsFrame = tk.CTkFrame(self.optionsWindow)
+        localO_button = tk.CTkButton(
             optionsFrame, text="Local", command=lambda: self.localOptions()
         )
 
-        onlineO_button = tk.Button(
+        onlineO_button = tk.CTkButton(
             optionsFrame, text="Online", command=lambda: self.onlineOptions()
         )
 
         optionsFrame.pack(expand=True)
 
-        localO_button.config(anchor=tk.CENTER)
+        localO_button.configure(anchor=tk.CENTER)
         localO_button.pack(expand=True)
-        onlineO_button.config(anchor=tk.CENTER)
+        onlineO_button.configure(anchor=tk.CENTER)
         onlineO_button.pack(expand=True)
         # optionsFrame.grid(row=0, column=0)
         # localO_button.grid(row=0, column=0)
@@ -202,31 +203,33 @@ class MainApplication(tk.Frame):
             self.onlineOWindow.destroy()
 
     def signup(self):
-        self.onlineOWindow = tk.Toplevel(self)
+        self.onlineOWindow = tk.CTkToplevel(self)
         # self.add_window.geometry("200x200")
         # grab_set() to isolate actions to window
         self.onlineOWindow.grab_set()
 
-        onlineOFrame = tk.Frame(self.onlineOWindow)
+        onlineOFrame = tk.CTkFrame(self.onlineOWindow)
         # username, password, password again
 
         # Username widgets
-        usernameLabel = tk.Label(onlineOFrame, text="Username", justify=tk.LEFT)
-        usernameEntry = tk.Entry(onlineOFrame, width=20)
+        usernameLabel = tk.CTkLabel(onlineOFrame, text="Username", justify=tk.LEFT)
+        usernameEntry = tk.CTkEntry(onlineOFrame, width=20)
 
         # Password widgets
-        passwordLabel = tk.Label(onlineOFrame, text="Password", justify=tk.LEFT)
-        passwordEntry = tk.Entry(onlineOFrame, width=20)
+        passwordLabel = tk.CTkLabel(onlineOFrame, text="Password", justify=tk.LEFT)
+        passwordEntry = tk.CTkEntry(onlineOFrame, width=20)
 
-        passwordRLabel = tk.Label(onlineOFrame, text="Retype Password", justify=tk.LEFT)
-        passwordREntry = tk.Entry(onlineOFrame, width=20)
+        passwordRLabel = tk.CTkLabel(
+            onlineOFrame, text="Retype Password", justify=tk.LEFT
+        )
+        passwordREntry = tk.CTkEntry(onlineOFrame, width=20)
 
         # Submit button
         # goes to function that pushes data to database
         # {accountusername: ... ,
         # accountpassword: ...(hashed) ,
         # accountdata: ...(users)}
-        submitButton = tk.Button(
+        submitButton = tk.CTkButton(
             onlineOFrame,
             text="Submit",
             command=lambda: self.signupSubmit(usernameEntry.get(), passwordEntry.get()),
@@ -293,28 +296,28 @@ class MainApplication(tk.Frame):
         # two options: upload data button, import data to listbox to import
         # run getLoggedInData()
 
-        self.loginWindow = tk.Toplevel(self)
+        self.loginWindow = tk.CTkToplevel(self)
         # self.add_window.geometry("200x200")
         # grab_set() to isolate actions to window
         self.loginWindow.grab_set()
 
-        loginFrame = tk.Frame(self.loginWindow)
+        loginFrame = tk.CTkFrame(self.loginWindow)
         # username, password, password again
 
         # Username widgets
-        usernameLabel = tk.Label(loginFrame, text="Username", justify=tk.LEFT)
-        usernameEntry = tk.Entry(loginFrame, width=20)
+        usernameLabel = tk.CTkLabel(loginFrame, text="Username", justify=tk.LEFT)
+        usernameEntry = tk.CTkEntry(loginFrame, width=20)
 
         # Password widgets
-        passwordLabel = tk.Label(loginFrame, text="Password", justify=tk.LEFT)
-        passwordEntry = tk.Entry(loginFrame, width=20)
+        passwordLabel = tk.CTkLabel(loginFrame, text="Password", justify=tk.LEFT)
+        passwordEntry = tk.CTkEntry(loginFrame, width=20)
 
         # Submit button
         # goes to function that pushes data to database
         # {accountusername: ... ,
         # accountpassword: ...(hashed) ,
         # accountdata: ...(users)}
-        submitButton = tk.Button(
+        submitButton = tk.CTkButton(
             loginFrame,
             text="Submit",
             command=lambda: self.loginSubmit(usernameEntry.get(), passwordEntry.get()),
@@ -332,20 +335,20 @@ class MainApplication(tk.Frame):
         loginFrame.grid(row=0, column=0)
 
     def onlineOptionsLO(self):
-        self.onlineOWindow = tk.Toplevel(self)
+        self.onlineOWindow = tk.CTkToplevel(self)
         self.onlineOWindow.geometry("200x200")
         # grab_set() to isolate actions to window
         self.onlineOWindow.grab_set()
 
-        onlineOFrame = tk.Frame(self.onlineOWindow)
+        onlineOFrame = tk.CTkFrame(self.onlineOWindow)
 
         # checked if already logged in or not
         # if not, allow for signup/login
 
-        signup_button = tk.Button(
+        signup_button = tk.CTkButton(
             onlineOFrame, text="Sign Up", command=lambda: self.signup()
         )
-        login_button = tk.Button(
+        login_button = tk.CTkButton(
             onlineOFrame, text="Login", command=lambda: self.login()
         )
         onlineOFrame.pack(expand=True)
@@ -356,17 +359,17 @@ class MainApplication(tk.Frame):
         # login_button.grid(row=1, column=0)
 
     def localOptions(self):
-        localOWindow = tk.Toplevel(self)
+        localOWindow = tk.CTkToplevel(self)
         localOWindow.geometry("200x200")
         # grab_set() to isolate actions to window
         localOWindow.grab_set()
 
-        localOFrame = tk.Frame(localOWindow)
+        localOFrame = tk.CTkFrame(localOWindow)
 
-        import_button = tk.Button(
+        import_button = tk.CTkButton(
             localOFrame, text="Import", command=lambda: self.switchUser()
         )
-        new_button = tk.Button(
+        new_button = tk.CTkButton(
             localOFrame, text="New user", command=lambda: self.newUserPopup()
         )
 
@@ -378,34 +381,34 @@ class MainApplication(tk.Frame):
         # new_button.grid(row=1, column=0)
 
     def newUserPopup(self):
-        self.newWindow = tk.Toplevel(self)
+        self.newWindow = tk.CTkToplevel(self)
         # self.add_window.geometry("200x200")
         # grab_set() to isolate actions to window
         self.newWindow.grab_set()
 
         # WIDGET RENDERING
-        newWindowFrame = tk.Frame(self.newWindow)
+        newWindowFrame = tk.CTkFrame(self.newWindow)
 
         firstNameVar = tk.StringVar()
-        firstNameLabel = tk.Label(self.newWindow, text="First Name")
-        firstName = tk.Entry(self.newWindow, textvariable=firstNameVar)
+        firstNameLabel = tk.CTkLabel(self.newWindow, text="First Name")
+        firstName = tk.CTkEntry(self.newWindow, textvariable=firstNameVar)
 
         lastNameVar = tk.StringVar()
-        lastNameLabel = tk.Label(self.newWindow, text="Last Name")
-        lastName = tk.Entry(self.newWindow, textvariable=lastNameVar)
+        lastNameLabel = tk.CTkLabel(self.newWindow, text="Last Name")
+        lastName = tk.CTkEntry(self.newWindow, textvariable=lastNameVar)
 
         usernameVar = tk.StringVar()
-        usernameLabel = tk.Label(self.newWindow, text="Username")
-        username = tk.Entry(self.newWindow, textvariable=usernameVar)
+        usernameLabel = tk.CTkLabel(self.newWindow, text="Username")
+        username = tk.CTkEntry(self.newWindow, textvariable=usernameVar)
 
-        createButton = tk.Button(
+        createButton = tk.CTkButton(
             self.newWindow,
             text="Create",
             command=lambda: self.createAndClose(
                 firstNameVar.get(), lastNameVar.get(), usernameVar.get()
             ),
         )
-        cancelButton = tk.Button(
+        cancelButton = tk.CTkButton(
             self.newWindow, text="Cancel", command=lambda: self.newWindow.destroy()
         )
 
@@ -452,38 +455,38 @@ class MainApplication(tk.Frame):
 
     def initialWidgetDisplay(self):
         # TOP FRAME
-        self.topframe = tk.Frame(self)
+        self.topframe = tk.CTkFrame(self)
 
-        account_button = tk.Button(
+        account_button = tk.CTkButton(
             self.topframe,
             text="Account",
             command=lambda: self.optionsPopup(),
-            bg="#c4dbff",
-            fg="black",
-            font="Helvetica 9 bold",
+            # #bg="#c4dbff",
+            # fg="black",
+            # font="Helvetica 9 bold",
         )
         account_button.grid(row=0, column=0)
 
-        save_button = tk.Button(
+        save_button = tk.CTkButton(
             self.topframe,
             text="Save",
-            bg="#c4dbff",
+            # #bg="#c4dbff",
             command=lambda: self.user.export_json(self.filepath),
         )
         save_button.grid(row=0, column=1)
 
-        quit_button = tk.Button(
+        quit_button = tk.CTkButton(
             self.topframe,
             text="Quit",
             command=lambda: self.QUIT(),
-            bg="#c4dbff",
-            fg="black",
+            # #bg="#c4dbff",
+            # fg="black",
         )
         quit_button.grid(row=0, column=3)
 
         # left option, right action
-        self.optionframe = tk.Frame(self)
-        self.actionframe = tk.Frame(self)
+        self.optionframe = tk.CTkFrame(self)
+        self.actionframe = tk.CTkFrame(self)
 
         # ACTION FRAME
         self.cframe = ClosetFrame(self.actionframe, self.user)
@@ -691,7 +694,9 @@ class MainApplication(tk.Frame):
 
 
 def main():
-    root = tk.Tk()
+    tk.set_appearance_mode("dark")
+    tk.set_default_color_theme("dark-blue")
+    root = tk.CTk()
     MainApplication(root)
     root.mainloop()
 
