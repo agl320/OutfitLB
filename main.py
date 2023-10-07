@@ -78,6 +78,16 @@ class MainApplication(tk.Frame):
         # except:
         #     print("> User upload cancelled")
 
+    # download data
+    def dataDownload(self, data):
+        print("[>>>] Downloading data...")
+        json_data = json.dumps(data, indent=4)
+        with open(
+            os.path.join(os.getcwd(), f"users\download-{data['userName']}.json"), "w"
+        ) as file:
+            file.write(json_data)
+        print("[>>>] Download done.")
+
     # retrieves logged in data and displays it for user to download locally
     def getLoggedInData(self):
         self.accountWindow = tk.Toplevel(self)
@@ -131,7 +141,11 @@ class MainApplication(tk.Frame):
                 text=f"Account: {acc['data'][i]['userName']}",
             ).grid(row=i, column=0)
 
-            tk.Button(accountFrame, text="Download").grid(row=i, column=1)
+            tk.Button(
+                accountFrame,
+                text="Download",
+                command=lambda: self.dataDownload(acc["data"][i]),
+            ).grid(row=i, column=1)
             # tk.Button(accountFrame, text="Delete").grid(row=i, column=2, command=lambda: acc['data'])
 
         accountFrame.grid(row=1, column=0)
