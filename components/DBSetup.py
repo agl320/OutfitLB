@@ -17,6 +17,7 @@ class DBSetup:
 
         """
         VERY POOR IMPLEMENTATION FOR LOGIN SYSTEM
+        - DID NOT USE SCHEMA FOR USERS
         """
 
         # ca = certifi.where()
