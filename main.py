@@ -144,7 +144,7 @@ class MainApplication(tk.Frame):
             tk.Button(
                 accountFrame,
                 text="Download",
-                command=lambda: self.dataDownload(acc["data"][i]),
+                command=lambda i=i: self.dataDownload(acc["data"][i]),
             ).grid(row=i, column=1)
             # tk.Button(accountFrame, text="Delete").grid(row=i, column=2, command=lambda: acc['data'])
 
