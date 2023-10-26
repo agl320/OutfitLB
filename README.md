@@ -11,6 +11,8 @@ Features:
 
 Run with `py .\main.py`
 
+![outfit-title](https://github.com/xegativ/OutfitLB/assets/52055203/b80541bb-8ffb-4be7-b8f4-0162bb95e980)
+
 What I want it to look like:
 ![OutfitLB-final-GH](https://github.com/xegativ/OutfitLB/assets/52055203/718d6669-9d05-43e6-a313-feb4ab584d32)
 
